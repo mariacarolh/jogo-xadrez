@@ -1,4 +1,6 @@
 #include <stdio.h>
+#include <stdlib.h> // Lib para limpar a tela
+
 #define TAM_TABULEIRO 8 // Tamanho padrão do tabuleiro
 
 // Peças pretas
@@ -21,8 +23,19 @@ const char bR = 'R'; // Rei
 
 char tabuleiro[TAM_TABULEIRO][TAM_TABULEIRO]; // Definir tamanho do tabuleiro 8 por 8
 
+void limparTela()
+{
+    #ifdef _WIN32
+        system("cls");
+    #else
+        system("clear");
+    #endif
+}
+
 void exibirTabuleiro()
 {
+    limparTela();
+
     for (int i = 0; i < TAM_TABULEIRO; i++) // x
     {
         printf("  ---------------------------------\n");
@@ -40,8 +53,10 @@ void exibirTabuleiro()
 
 void iniciarTabuleiro()
 {
-       // Array criado para posicionar as peças dentro do tabuleiro
-       char posicoesIniciais[TAM_TABULEIRO][TAM_TABULEIRO] = { 
+    limparTela();
+    // Array criado para posicionar as peças dentro do tabuleiro
+    char posicoesIniciais[TAM_TABULEIRO][TAM_TABULEIRO] = 
+    { 
         {pT, pC, pB, pD, pR, pB, pC, pT},
         {pP, pP, pP, pP, pP, pP, pP, pP},
         {eV, eV, eV, eV, eV, eV, eV, eV},
@@ -49,7 +64,8 @@ void iniciarTabuleiro()
         {eV, eV, eV, eV, eV, eV, eV, eV},
         {eV, eV, eV, eV, eV, eV, eV, eV},
         {bP, bP, bP, bP, bP, bP, bP, bP},
-        {bT, bC, bB, bD, bR, bB, bC, bT}};
+        {bT, bC, bB, bD, bR, bB, bC, bT}
+    };
 
     for (int i = 0; i < TAM_TABULEIRO; i++)
     {
