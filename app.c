@@ -2,6 +2,8 @@
 #include <stdlib.h> // Lib para limpar a tela
 
 #define TAM_TABULEIRO 8 // Tamanho padrão do tabuleiro
+#define MAGENTA "\x1b[35m" // Definindo a cor MAGENTA
+#define RESET "\x1B[0m" // Reset de cor
 
 // Peças pretas
 const char pP = 'p'; // Peao
@@ -43,7 +45,16 @@ void exibirTabuleiro()
 
         for (int j = 0; j < TAM_TABULEIRO; j++) // y
         {
-            printf("| %c ", tabuleiro[i][j]);
+            char peca = tabuleiro[i][j];
+
+            if(peca == pP || peca == pT || peca == pC || peca == pB || peca == pR || peca == pD)
+            {
+                printf("| " MAGENTA "%c " RESET, peca);
+            }
+            else
+            {
+                printf("| %c ", peca);
+            }
         }
         printf("| \n");
     }
