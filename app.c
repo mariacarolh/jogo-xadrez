@@ -88,8 +88,35 @@ void iniciarTabuleiro()
     }
 }
 
+int posicaoValida(int x, int y)
+{
+    return (x >= 0 && x < TAM_TABULEIRO && y >= 0 && y < TAM_TABULEIRO); 
+    // X e Y são maiores ou iguais a zero, ou seja, não é uma posição negativa.
+    // X e Y são menores que 8, ou seja, estão dentro das linhas válidas do tabuleiro.
+    // Se todas essas condições forem verdadeiras, a função retorna true. 
+    // Caso contrário, retorna false. Indicando uma posição não válida
+}
+
+void moverPeca(int inicioX, int inicioY, int fimX, int fimY)
+{
+    // Se a peça não for válida, mostre: (A peça é a posição)
+    if (!posicaoValida(inicioX, inicioY) || !posicaoValida(fimX, fimY)) 
+    {
+        printf("A posicao informada nao e valida, tente novamente!\n");
+        return;
+    }
+
+    // A peça inicial vai para o destino/fim 
+    tabuleiro[fimX][fimY] = tabuleiro[inicioX][inicioY];
+    // A posição inicial recebe um espaço vazio
+    tabuleiro[inicioX][inicioY] = eV;
+}
+
 int main()
 {
     iniciarTabuleiro();
     exibirTabuleiro();
+    moverPeca(7,0,7,4);
+    exibirTabuleiro();
+
 }
