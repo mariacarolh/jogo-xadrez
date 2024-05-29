@@ -112,11 +112,41 @@ void moverPeca(int inicioX, int inicioY, int fimX, int fimY)
     tabuleiro[inicioX][inicioY] = eV;
 }
 
+void obterMovimentoUsuario()
+{
+    // 3 por para caractere nulo de terminação
+    char inicio[3];
+    char fim[3];
+
+    printf("Insira a peca que sera movimentada: ");
+    scanf("%s", inicio);
+
+    printf("Insira para onde a peca sera movimentada: ");
+    scanf("%s", fim);
+
+    int inicioY = inicio[0] - 'a';
+    // Calcula a coordenada Y (coluna) da posição inicial
+    // subtraindo o valor ASCII do primeiro caractere de início pelo valor ASCII do caractere ‘a’.
+    // Isso converte a letra da coluna (por exemplo, ‘a’, ‘b’, ‘c’) em um índice numérico (0, 1, 2).
+
+    int inicioX = 8 - (inicio[1] - '0');
+    // Calcula a coordenada X (linha) da posição inicial
+    // subtraindo o valor ASCII do segundo caractere de início pelo valor ASCII do caractere ‘0’
+    // em seguida, subtraindo o resultado de 8.
+    // Isso converte o dígito da linha (por exemplo, ‘1’, ‘2’, ‘3’) em um índice numérico (0, 1, 2).
+
+    int fimY = fim[0] - 'a';
+    // mesmo processo do início Y
+    int fimX = 8 - (fim[1] - '0');
+    // mesmo processo do início X
+
+    moverPeca(inicioX, inicioY, fimX, fimY);
+}
+
 int main()
 {
     iniciarTabuleiro();
     exibirTabuleiro();
-    moverPeca(7,0,7,4);
+    obterMovimentoUsuario();
     exibirTabuleiro();
-
 }
