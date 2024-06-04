@@ -118,10 +118,10 @@ void obterMovimentoUsuario()
     char inicio[3];
     char fim[3];
 
-    printf("Insira a peca que sera movimentada: ");
+    printf("\nInsira a peca que sera movimentada: ");
     scanf("%s", inicio);
 
-    printf("Insira para onde a peca sera movimentada: ");
+    printf("\nInsira para onde a peca sera movimentada: ");
     scanf("%s", fim);
 
     int inicioY = inicio[0] - 'a';
@@ -147,6 +147,11 @@ int main()
 {
     iniciarTabuleiro();
     exibirTabuleiro();
-    obterMovimentoUsuario();
-    exibirTabuleiro();
+    printf("\n");
+    while(1)
+    {
+        obterMovimentoUsuario();
+        exibirTabuleiro();
+        printf("\n");
+    }
 }
