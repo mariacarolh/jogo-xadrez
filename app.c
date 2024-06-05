@@ -6,22 +6,24 @@
 #define RESET "\x1B[0m" // Reset de cor
 
 // Peças pretas
-const char pP = 'p'; // Peao
-const char pT = 't'; // Torre
-const char pC = 'c'; // Cavalo
-const char pB = 'b'; // Bispo
-const char pD = 'd'; // Dama
-const char pR = 'r'; // Rei
+const char peaoPreto = 'p'; // Peao
+const char torrePreta = 't'; // Torre
+const char cavaloPreto = 'c'; // Cavalo
+const char bispoPreto = 'b'; // Bispo
+const char damaPreta = 'd'; // Dama
+const char reiPreto = 'r'; // Rei
 
-const char eV = ' '; // Espaço vazio
+const char espacoVazio = ' '; // Espaço vazio
 
 // Peças brancas
-const char bP = 'P'; // Peao
-const char bT = 'T'; // Torre
-const char bC = 'C'; // Cavalo
-const char bB = 'B'; // Bispo
-const char bD = 'D'; // Dama
-const char bR = 'R'; // Rei
+const char peaoBranco = 'P'; // Peao
+const char torreBranca = 'T'; // Torre
+const char cavaloBranco = 'C'; // Cavalo
+const char bispoBranco = 'B'; // Bispo
+const char damaBranca = 'D'; // Dama
+const char reiBranco = 'R'; // Rei
+
+int turno = 0; // Variável para turnos (0 brancas e 1 pretas)
 
 char tabuleiro[TAM_TABULEIRO][TAM_TABULEIRO]; // Definir tamanho do tabuleiro 8 por 8
 
@@ -38,16 +40,16 @@ void exibirTabuleiro()
 {
     limparTela();
 
-    for (int i = 0; i < TAM_TABULEIRO; i++) // x
+    for (int x = 0; x < TAM_TABULEIRO; x++) // x
     {
         printf("  ---------------------------------\n");
-        printf("%d ", 8 - i); // Inserir coordenada Y na coluna (1 à 8)
+        printf("%d ", 8 - x); // Inserir coordenada Y na coluna (1 à 8)
 
-        for (int j = 0; j < TAM_TABULEIRO; j++) // y
+        for (int y = 0; y < TAM_TABULEIRO; y++) // y
         {
-            char peca = tabuleiro[i][j];
+            char peca = tabuleiro[x][y];
 
-            if(peca == pP || peca == pT || peca == pC || peca == pB || peca == pR || peca == pD)
+            if(peca == peaoPreto || peca == torrePreta || peca == cavaloPreto || peca == bispoPreto || peca == reiPreto || peca == damaPreta)
             {
                 printf("| " MAGENTA "%c " RESET, peca);
             }
@@ -68,22 +70,22 @@ void iniciarTabuleiro()
     // Array criado para posicionar as peças dentro do tabuleiro
     char posicoesIniciais[TAM_TABULEIRO][TAM_TABULEIRO] = 
     { 
-        {pT, pC, pB, pD, pR, pB, pC, pT},
-        {pP, pP, pP, pP, pP, pP, pP, pP},
-        {eV, eV, eV, eV, eV, eV, eV, eV},
-        {eV, eV, eV, eV, eV, eV, eV, eV},
-        {eV, eV, eV, eV, eV, eV, eV, eV},
-        {eV, eV, eV, eV, eV, eV, eV, eV},
-        {bP, bP, bP, bP, bP, bP, bP, bP},
-        {bT, bC, bB, bD, bR, bB, bC, bT}
+        {torrePreta, cavaloPreto, bispoPreto, damaPreta, reiPreto, bispoPreto, cavaloPreto, torrePreta},
+        {peaoPreto, peaoPreto, peaoPreto, peaoPreto, peaoPreto, peaoPreto, peaoPreto, peaoPreto},
+        {espacoVazio, espacoVazio, espacoVazio, espacoVazio, espacoVazio, espacoVazio, espacoVazio, espacoVazio},
+        {espacoVazio, espacoVazio, espacoVazio, espacoVazio, espacoVazio, espacoVazio, espacoVazio, espacoVazio},
+        {espacoVazio, espacoVazio, espacoVazio, espacoVazio, espacoVazio, espacoVazio, espacoVazio, espacoVazio},
+        {espacoVazio, espacoVazio, espacoVazio, espacoVazio, espacoVazio, espacoVazio, espacoVazio, espacoVazio},
+        {peaoBranco, peaoBranco, peaoBranco, peaoBranco, peaoBranco, peaoBranco, peaoBranco, peaoBranco},
+        {torreBranca, cavaloBranco, bispoBranco, damaBranca, reiBranco, bispoBranco, cavaloBranco, torreBranca}
     };
 
-    for (int i = 0; i < TAM_TABULEIRO; i++)
+    for (int x = 0; x < TAM_TABULEIRO; x++)
     {
-        for (int j = 0; j < TAM_TABULEIRO; j++)
+        for (int y = 0; y < TAM_TABULEIRO; y++)
         {
             // posicoesIniciais foi inserido ao exibirTabuleiro já com as peças em suas posições corretas
-            tabuleiro[i][j] = posicoesIniciais[i][j];
+            tabuleiro[x][y] = posicoesIniciais[x][y];
         }
     }
 }
@@ -109,7 +111,7 @@ void moverPeca(int inicioX, int inicioY, int fimX, int fimY)
     // A peça inicial vai para o destino/fim 
     tabuleiro[fimX][fimY] = tabuleiro[inicioX][inicioY];
     // A posição inicial recebe um espaço vazio
-    tabuleiro[inicioX][inicioY] = eV;
+    tabuleiro[inicioX][inicioY] = espacoVazio;
 }
 
 void obterMovimentoUsuario()
@@ -118,6 +120,15 @@ void obterMovimentoUsuario()
     char inicio[3];
     char fim[3];
 
+    if(turno % 2 == 0)
+    {
+        printf("Turno das pecas brancas");
+    }
+    else
+    {
+        printf("Turno das pecas pretas");
+    }
+    
     printf("\nInsira a peca que sera movimentada: ");
     scanf("%s", inicio);
 
@@ -140,7 +151,22 @@ void obterMovimentoUsuario()
     int fimX = 8 - (fim[1] - '0');
     // mesmo processo do início X
 
-    moverPeca(inicioX, inicioY, fimX, fimY);
+    char peca = tabuleiro[inicioX][inicioY];
+
+    if(turno % 2 == 0 && (peca == peaoPreto || peca == torrePreta || peca == cavaloPreto || peca == bispoPreto || peca == reiPreto || peca == damaPreta)
+        || turno % 2 == 1 && (peca == peaoBranco || peca == torreBranca || peca == cavaloBranco || peca == bispoBranco || peca == reiBranco || peca == damaBranca))
+    {
+        printf("Nao e o turno desta peça. Por favor, tente novamente.\n");
+        return;
+    }
+
+    if(tabuleiro[inicioX][inicioY] != espacoVazio && posicaoValida(inicioX,inicioY) && posicaoValida(fimX,fimY))
+    {
+        moverPeca(inicioX, inicioY, fimX, fimY);
+        turno++;
+    } else {
+        printf("Movimento invalido. Por favor, tente novamente.\n");
+    }
 }
 
 int main()
@@ -148,6 +174,7 @@ int main()
     iniciarTabuleiro();
     exibirTabuleiro();
     printf("\n");
+    
     while(1)
     {
         obterMovimentoUsuario();
