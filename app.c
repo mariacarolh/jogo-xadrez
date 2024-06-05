@@ -99,8 +99,33 @@ int posicaoValida(int x, int y)
     // Caso contrário, retorna false. Indicando uma posição não válida
 }
 
+int moverPeaoBranco(int inicioX, int fimX)
+{
+    int casasAndadas = inicioX - fimX;
+    if(casasAndadas != 1){
+        printf("Movimento invalido. Tente novamente.\n");
+        return 0;
+    }  
+
+    return 1;
+}
+
+int moverPeaoPreto(int inicioX, int fimX) 
+{
+    int casasAndadas = inicioX - fimX;
+    if(casasAndadas != -1){
+        printf("Movimento invalido. Tente novamente.\n");
+        return 0;
+    }  
+
+    return 1;
+}
+
 void moverPeca(int inicioX, int inicioY, int fimX, int fimY)
 {
+    char peca = tabuleiro[inicioX][inicioY];
+    int movimentoValido;
+    
     // Se a peça não for válida, mostre: (A peça é a posição)
     if (!posicaoValida(inicioX, inicioY) || !posicaoValida(fimX, fimY)) 
     {
@@ -108,10 +133,23 @@ void moverPeca(int inicioX, int inicioY, int fimX, int fimY)
         return;
     }
 
-    // A peça inicial vai para o destino/fim 
-    tabuleiro[fimX][fimY] = tabuleiro[inicioX][inicioY];
-    // A posição inicial recebe um espaço vazio
-    tabuleiro[inicioX][inicioY] = espacoVazio;
+    if(peca == peaoBranco)
+    {
+        movimentoValido = moverPeaoBranco(inicioX, fimX);
+    }
+    if(peca == peaoPreto)
+    {
+        movimentoValido = moverPeaoPreto(inicioX, fimX);
+    }
+
+    if(movimentoValido == 1)
+    {
+        turno ++;
+        // A peça inicial vai para o destino/fim 
+        tabuleiro[fimX][fimY] = tabuleiro[inicioX][inicioY];
+        // A posição inicial recebe um espaço vazio
+        tabuleiro[inicioX][inicioY] = espacoVazio;
+    }
 }
 
 void obterMovimentoUsuario()
@@ -163,7 +201,6 @@ void obterMovimentoUsuario()
     if(tabuleiro[inicioX][inicioY] != espacoVazio && posicaoValida(inicioX,inicioY) && posicaoValida(fimX,fimY))
     {
         moverPeca(inicioX, inicioY, fimX, fimY);
-        turno++;
     } else {
         printf("Movimento invalido. Por favor, tente novamente.\n");
     }
