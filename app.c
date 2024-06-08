@@ -2,7 +2,7 @@
 #include <stdlib.h> // Lib para limpar a tela
 
 #define TAM_TABULEIRO 8    // Tamanho padrão do tabuleiro
-#define MAGENTA "\x1b[35m" // Definindo a cor MAGENTA
+#define MAGENTA "\x1b[38;5;200m" // Definindo a cor MAGENTA
 #define RESET "\x1B[0m"    // Reset de cor
 
 // Peças pretas
@@ -42,8 +42,8 @@ void exibirTabuleiro()
 
     for (int x = 0; x < TAM_TABULEIRO; x++) // x
     {
-        printf("  ---------------------------------\n");
-        printf("%d ", 8 - x); // Inserir coordenada Y na coluna (1 à 8)
+        printf("   ---------------------------------\n");
+        printf(" %d ", 8 - x);// Inserir coordenada Y na coluna (1 à 8)
 
         for (int y = 0; y < TAM_TABULEIRO; y++) // y
         {
@@ -51,7 +51,7 @@ void exibirTabuleiro()
 
             if (peca == peaoPreto || peca == torrePreta || peca == cavaloPreto || peca == bispoPreto || peca == reiPreto || peca == damaPreta)
             {
-                printf("| " MAGENTA "%c " RESET, peca);
+               printf("| " MAGENTA "%c" RESET " ", tabuleiro[x][y]);
             }
             else
             {
@@ -60,8 +60,8 @@ void exibirTabuleiro()
         }
         printf("| \n");
     }
-    printf("  ---------------------------------\n");
-    printf("    a   b   c   d   e   f   g   h\n"); // Inserir coordenada X na coluna (A à H)
+    printf("   ---------------------------------\n");
+    printf("     a   b   c   d   e   f   g   h\n"); // Inserir coordenada X na coluna (A à H)
 }
 
 void iniciarTabuleiro()
@@ -150,6 +150,19 @@ int moverCavalo(int inicioX, int inicioY, int fimX, int fimY)
     }
 }
 
+int moverBispo(int inicioX, int inicioY, int fimX, int fimY) {
+    int casasAndadasX = fimX - inicioX;
+    int casasAndadasY = fimY - inicioY;
+
+    // Valida as casas entre as colunas e as linhas para verificar a diagonal
+    if (casasAndadasX == casasAndadasY || casasAndadasX == -casasAndadasY) {
+        return 1;
+    } else {
+        printf("Movimento inválido. Tente novamente.\n");
+        return 0;
+    }
+}
+
 void moverPeca(int inicioX, int inicioY, int fimX, int fimY)
 {
     char peca = tabuleiro[inicioX][inicioY];
@@ -177,6 +190,10 @@ void moverPeca(int inicioX, int inicioY, int fimX, int fimY)
     if (peca == cavaloPreto)
     {
         movimentoValido = moverCavalo(inicioX, inicioY, fimX, fimY);
+    }
+    if (peca == bispoBranco)
+    {
+        movimentoValido = moverBispo(inicioX, inicioY, fimX, fimY);
     }
 
     if (movimentoValido == 1)
