@@ -2,7 +2,8 @@
 #include <stdlib.h> // Lib para limpar a tela
 
 #define TAM_TABULEIRO 8          // Tamanho padrão do tabuleiro
-#define MAGENTA "\x1b[38;5;200m" // Definindo a cor MAGENTA
+#define MAGENTA "\x1b[38;5;200m" // Definindo a cor rosa
+#define VERMELHO "\x1b[38;5;9m" // Definindo a cor vermelha
 #define RESET "\x1B[0m"          // Reset de cor
 
 // Peças pretas
@@ -24,7 +25,7 @@ const char damaBranca = 'D';   // Dama
 const char reiBranco = 'R';    // Rei
 
 int turno = 0; // Variável para turnos (0 brancas e 1 pretas)
-
+char mensagemErro[100] = ""; // Mensagens de erros
 char tabuleiro[TAM_TABULEIRO][TAM_TABULEIRO]; // Definir tamanho do tabuleiro 8 por 8
 
 void limparTela()
@@ -62,6 +63,11 @@ void exibirTabuleiro()
     }
     printf("   ---------------------------------\n");
     printf("     a   b   c   d   e   f   g   h\n"); // Inserir coordenada X na coluna (A à H)
+
+    if(mensagemErro[0] != '\0') // Se a mensagem de erro não estiver vazia será exibido o aviso 
+    {
+        printf("\nErro: " VERMELHO "%s\n" RESET, mensagemErro);
+    }
 }
 
 void iniciarTabuleiro()
@@ -110,7 +116,7 @@ int moverPeao(int inicioX, int fimX, char tipoPeca)
         }
         else if (casasAndadas != 1)
         {
-            printf("Movimento invalido. Tente novamente.\n");
+            snprintf(mensagemErro, sizeof(mensagemErro), "Movimento invalido, tente novamente!");
             return 0;
         }
     }
@@ -122,7 +128,7 @@ int moverPeao(int inicioX, int fimX, char tipoPeca)
         }
         else if (casasAndadas != -1)
         {
-            printf("Movimento invalido. Tente novamente.\n");
+            snprintf(mensagemErro, sizeof(mensagemErro),"Movimento invalido, tente novamente!");
             return 0;
         }
     }
@@ -145,7 +151,7 @@ int moverCavalo(int inicioX, int inicioY, int fimX, int fimY)
     }
     else
     {
-        printf("Movimento inválido. Tente novamente.\n");
+        snprintf(mensagemErro, sizeof(mensagemErro),"Movimento invalido, tente novamente!");
         return 0;
     }
 }
@@ -162,7 +168,7 @@ int moverBispo(int inicioX, int inicioY, int fimX, int fimY)
     }
     else
     {
-        printf("Movimento inválido. Tente novamente.\n");
+        snprintf(mensagemErro, sizeof(mensagemErro),"Movimento invalido, tente novamente!");
         return 0;
     }
 }
@@ -176,7 +182,7 @@ int moverTorre(int inicioX, int inicioY, int fimX, int fimY)
     }
     else
     {
-        printf("Movimento inválido. Tente novamente.\n");
+        snprintf(mensagemErro, sizeof(mensagemErro),"Movimento invalido, tente novamente!");
         return 0;
     }
 }
@@ -193,7 +199,7 @@ int moverDama(int inicioX, int inicioY, int fimX, int fimY)
     }
     else
     {
-        printf("Movimento inválido. Tente novamente.\n");
+        snprintf(mensagemErro, sizeof(mensagemErro),"Movimento invalido, tente novamente!");
         return 0;
     }
 }
@@ -209,7 +215,7 @@ int moverRei(int inicioX, int inicioY, int fimX, int fimY)
     }
     else
     {
-        printf("Movimento inválido. Tente novamente.\n");
+        snprintf(mensagemErro, sizeof(mensagemErro),"Movimento invalido, tente novamente!");
         return 0;
     }
 }
@@ -222,7 +228,7 @@ void moverPeca(int inicioX, int inicioY, int fimX, int fimY)
     // Se a peça não for válida (A peça é a posição)
     if (!posicaoValida(inicioX, inicioY) || !posicaoValida(fimX, fimY))
     {
-        printf("A posicao informada nao e valida, tente novamente!\n");
+        snprintf(mensagemErro, sizeof(mensagemErro),"A posicao informada nao e valida, tente novamente!");
         return;
     }
 
@@ -306,7 +312,7 @@ void obterMovimentoUsuario()
 
     if (turno % 2 == 0 && (peca == peaoPreto || peca == torrePreta || peca == cavaloPreto || peca == bispoPreto || peca == reiPreto || peca == damaPreta) || turno % 2 == 1 && (peca == peaoBranco || peca == torreBranca || peca == cavaloBranco || peca == bispoBranco || peca == reiBranco || peca == damaBranca))
     {
-        printf("Nao e o turno desta peça. Por favor, tente novamente.\n");
+        snprintf(mensagemErro, sizeof(mensagemErro),"Nao e o turno desta peca, tente novamente!");
         return;
     }
 
@@ -316,7 +322,7 @@ void obterMovimentoUsuario()
     }
     else
     {
-        printf("Movimento invalido. Por favor, tente novamente.\n");
+        snprintf(mensagemErro, sizeof(mensagemErro),"Movimento invalido, tente novamente!");
     }
 }
 
