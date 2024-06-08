@@ -198,6 +198,22 @@ int moverDama(int inicioX, int inicioY, int fimX, int fimY)
     }
 }
 
+int moverRei(int inicioX, int inicioY, int fimX, int fimY)
+{
+    int diferencaX = fimX - inicioX;
+    int diferencaY = fimY - inicioY;
+
+    if ((diferencaX >= -1 && diferencaX <= 1) && (diferencaY >= -1 && diferencaY <= 1))
+    {
+        return 1;
+    }
+    else
+    {
+        printf("Movimento inválido. Tente novamente.\n");
+        return 0;
+    }
+}
+
 void moverPeca(int inicioX, int inicioY, int fimX, int fimY)
 {
     char peca = tabuleiro[inicioX][inicioY];
@@ -234,6 +250,11 @@ void moverPeca(int inicioX, int inicioY, int fimX, int fimY)
     {
         movimentoValido = moverDama(inicioX, inicioY, fimX, fimY);
     }
+    if (peca == reiBranco || peca == reiPreto)
+    {
+        movimentoValido = moverRei(inicioX, inicioY, fimX, fimY);
+    }
+    
     if (movimentoValido == 1)
     {
         turno++;
