@@ -104,6 +104,14 @@ int posicaoValida(int x, int y)
     // Caso contrário, retorna false. Indicando uma posição não válida
 }
 
+int pecaAliada(char peca, char pecaDestino)
+{
+    // Verifica se ambas as peças são maiúsculas ou minúsculas.
+    // Se a peça inicial for do mesmo tamanho (caps-lock) da final, é aliado.
+    return ((peca >= 'a' && peca <= 'z' && pecaDestino >= 'a' && pecaDestino <= 'z') ||
+            (peca >= 'A' && peca <= 'Z' && pecaDestino >= 'A' && pecaDestino <= 'Z'));
+} 
+
 int moverPeao(int inicioX, int fimX, char tipoPeca)
 {
     int casasAndadas = inicioX - fimX;
@@ -223,12 +231,18 @@ int moverRei(int inicioX, int inicioY, int fimX, int fimY)
 void moverPeca(int inicioX, int inicioY, int fimX, int fimY)
 {
     char peca = tabuleiro[inicioX][inicioY];
+    char pecaDestino = tabuleiro[fimX][fimY];
     int movimentoValido;
 
     // Se a peça não for válida (A peça é a posição)
     if (!posicaoValida(inicioX, inicioY) || !posicaoValida(fimX, fimY))
     {
         snprintf(mensagemErro, sizeof(mensagemErro),"A posicao informada nao e valida, tente novamente!");
+        return;
+    }
+    if(pecaDestino != espacoVazio && pecaAliada(peca, pecaDestino))
+    {
+        snprintf(mensagemErro, sizeof(mensagemErro),"Movimento invalido, nao e possivel atacar pecas aliadas!");
         return;
     }
 
