@@ -3,7 +3,7 @@
 
 #define TAM_TABULEIRO 8          // Tamanho padrão do tabuleiro
 #define MAGENTA "\x1b[38;5;200m" // Definindo a cor rosa
-#define VERMELHO "\x1b[38;5;9m" // Definindo a cor vermelha
+#define VERMELHO "\x1b[38;5;9m"  // Definindo a cor vermelha
 #define RESET "\x1B[0m"          // Reset de cor
 
 // Peças pretas
@@ -24,8 +24,8 @@ const char bispoBranco = 'B';  // Bispo
 const char damaBranca = 'D';   // Dama
 const char reiBranco = 'R';    // Rei
 
-int turno = 0; // Variável para turnos (0 brancas e 1 pretas)
-char mensagemErro[100] = ""; // Mensagens de erros
+int turno = 0;                                // Variável para turnos (0 brancas e 1 pretas)
+char mensagemErro[100] = "";                  // Mensagens de erros
 char tabuleiro[TAM_TABULEIRO][TAM_TABULEIRO]; // Definir tamanho do tabuleiro 8 por 8
 
 void limparTela()
@@ -64,7 +64,7 @@ void exibirTabuleiro()
     printf("   ---------------------------------\n");
     printf("     a   b   c   d   e   f   g   h\n"); // Inserir coordenada X na coluna (A à H)
 
-    if(mensagemErro[0] != '\0') // Se a mensagem de erro não estiver vazia será exibido o aviso 
+    if (mensagemErro[0] != '\0') // Se a mensagem de erro não estiver vazia será exibido o aviso
     {
         printf("\nErro: " VERMELHO "%s\n" RESET, mensagemErro);
     }
@@ -110,12 +110,12 @@ int pecaAliada(char peca, char pecaDestino)
     // Se a peça inicial for do mesmo tamanho (caps-lock) da final, é aliado.
     return ((peca >= 'a' && peca <= 'z' && pecaDestino >= 'a' && pecaDestino <= 'z') ||
             (peca >= 'A' && peca <= 'Z' && pecaDestino >= 'A' && pecaDestino <= 'Z'));
-} 
+}
 
 int caminhoLinhaColunaLivre(char inicioX, char inicioY, char fimX, char fimY)
 {
     // Verifica se o caminho horizontal está livre
-    if (inicioX == fimX) 
+    if (inicioX == fimX)
     {
         // é necessário verificar todas as casas entre inicioX e fimX
         // então verificamos qual dos dois é o menor (menorX) e qual é o maior (maiorX)
@@ -123,8 +123,11 @@ int caminhoLinhaColunaLivre(char inicioX, char inicioY, char fimX, char fimY)
         int menorY = inicioY < fimY ? inicioY : fimY;
         int maiorY = inicioY > fimY ? inicioY : fimY;
 
-        for (int y = menorY + 1; y < maiorY; y++) {
-            if (tabuleiro[inicioX][y] != espacoVazio) {
+        for (int y = menorY + 1; y < maiorY; y++)
+        {
+            if (tabuleiro[inicioX][y] != espacoVazio)
+            {
+                snprintf(mensagemErro, sizeof(mensagemErro), "Movimento invalido, existe uma peca no caminho!");
                 return 0; // Caminho bloqueado
             }
         }
@@ -134,13 +137,48 @@ int caminhoLinhaColunaLivre(char inicioX, char inicioY, char fimX, char fimY)
         int menorX = inicioX < fimX ? inicioX : fimX;
         int maiorX = inicioX > fimX ? inicioX : fimX;
 
-        for (int x = menorX + 1; x < maiorX; x++) {
-            if (tabuleiro[x][inicioY] != espacoVazio) {
+        for (int x = menorX + 1; x < maiorX; x++)
+        {
+            if (tabuleiro[x][inicioY] != espacoVazio)
+            {
+                snprintf(mensagemErro, sizeof(mensagemErro), "Movimento invalido, existe uma peca no caminho!");
                 return 0;
             }
         }
     }
-    return 1; //Caminho livre
+    return 1; // Caminho livre
+}
+
+int caminhoDiagonalLivre(char inicioX, char inicioY, char fimX, char fimY)
+{
+    int casasAndadasX = (fimX > inicioX) ? 1 : -1;
+    int casasAndadasY = (fimY > inicioY) ? 1 : -1;
+
+    int x = inicioX + casasAndadasX;
+    int y = inicioY + casasAndadasY;
+
+    // Loop para percorrer o caminho diagonal
+    while (x != fimX || y != fimY)
+    {
+        // Se a posição atual não estiver vazia, retorna 0 (caminho bloqueado)
+        if (tabuleiro[x][y] != espacoVazio)
+        {
+            snprintf(mensagemErro, sizeof(mensagemErro), "Movimento invalido, existe uma peca no caminho!");
+            return 0;
+        }
+        // Muda as posições para a próxima casa na diagonal
+        x += casasAndadasX;
+        y += casasAndadasY;
+
+        // Se a posição não for válida, interrompe o loop
+        if (!posicaoValida(x, y))
+        {
+            break;
+        }
+    }
+
+    // Se todas as casas na diagonal estiverem livres, retorna 1
+    return 1;
 }
 
 int moverPeao(int inicioX, int fimX, char tipoPeca)
@@ -167,7 +205,7 @@ int moverPeao(int inicioX, int fimX, char tipoPeca)
         }
         else if (casasAndadas != -1)
         {
-            snprintf(mensagemErro, sizeof(mensagemErro),"Movimento invalido, tente novamente!");
+            snprintf(mensagemErro, sizeof(mensagemErro), "Movimento invalido, tente novamente!");
             return 0;
         }
     }
@@ -190,7 +228,7 @@ int moverCavalo(int inicioX, int inicioY, int fimX, int fimY)
     }
     else
     {
-        snprintf(mensagemErro, sizeof(mensagemErro),"Movimento invalido, tente novamente!");
+        snprintf(mensagemErro, sizeof(mensagemErro), "Movimento invalido, tente novamente!");
         return 0;
     }
 }
@@ -203,11 +241,11 @@ int moverBispo(int inicioX, int inicioY, int fimX, int fimY)
     // Valida as casas entre as colunas e as linhas para verificar a diagonal
     if (casasAndadasX == casasAndadasY || casasAndadasX == -casasAndadasY)
     {
-        return 1;
+        return caminhoDiagonalLivre(inicioX, inicioY, fimX, fimY);
     }
     else
     {
-        snprintf(mensagemErro, sizeof(mensagemErro),"Movimento invalido, tente novamente!");
+        snprintf(mensagemErro, sizeof(mensagemErro), "Movimento invalido, tente novamente!");
         return 0;
     }
 }
@@ -215,13 +253,13 @@ int moverBispo(int inicioX, int inicioY, int fimX, int fimY)
 int moverTorre(int inicioX, int inicioY, int fimX, int fimY)
 {
     // Valida se a torre continua na reta inicial (linha ou coluna)
-    if (inicioX == fimX || inicioY == fimY && caminhoLinhaColunaLivre(inicioX, inicioY, fimX, fimY))
+    if (inicioX == fimX || inicioY == fimY)
     {
-        return 1;
+        return caminhoLinhaColunaLivre(inicioX, inicioY, fimX, fimY);
     }
     else
     {
-        snprintf(mensagemErro, sizeof(mensagemErro),"Movimento invalido, tente novamente!");
+        snprintf(mensagemErro, sizeof(mensagemErro), "Movimento invalido, tente novamente!");
         return 0;
     }
 }
@@ -234,27 +272,27 @@ int moverDama(int inicioX, int inicioY, int fimX, int fimY)
     // Segue a combinação das regras do bispo e da torre
     if ((inicioX == fimX || inicioY == fimY) || (casasAndadasX == casasAndadasY || casasAndadasX == -casasAndadasY))
     {
-        return 1;
+        return (caminhoDiagonalLivre(inicioX, inicioY, fimX, fimY) && caminhoLinhaColunaLivre(inicioX, inicioY, fimX, fimY));
     }
     else
     {
-        snprintf(mensagemErro, sizeof(mensagemErro),"Movimento invalido, tente novamente!");
+        snprintf(mensagemErro, sizeof(mensagemErro), "Movimento invalido, tente novamente!");
         return 0;
     }
 }
 
 int moverRei(int inicioX, int inicioY, int fimX, int fimY)
 {
-    int diferencaX = fimX - inicioX;
-    int diferencaY = fimY - inicioY;
+    int casasAndadasX = fimX - inicioX;
+    int casasAndadasY = fimY - inicioY;
 
-    if ((diferencaX >= -1 && diferencaX <= 1) && (diferencaY >= -1 && diferencaY <= 1))
+    if ((casasAndadasX >= -1 && casasAndadasX <= 1) && (casasAndadasY >= -1 && casasAndadasY <= 1))
     {
         return 1;
     }
     else
     {
-        snprintf(mensagemErro, sizeof(mensagemErro),"Movimento invalido, tente novamente!");
+        snprintf(mensagemErro, sizeof(mensagemErro), "Movimento invalido, tente novamente!");
         return 0;
     }
 }
@@ -268,12 +306,12 @@ void moverPeca(int inicioX, int inicioY, int fimX, int fimY)
     // Se a peça não for válida (A peça é a posição)
     if (!posicaoValida(inicioX, inicioY) || !posicaoValida(fimX, fimY))
     {
-        snprintf(mensagemErro, sizeof(mensagemErro),"A posicao informada nao e valida, tente novamente!");
+        snprintf(mensagemErro, sizeof(mensagemErro), "A posicao informada nao e valida, tente novamente!");
         return;
     }
-    if(pecaDestino != espacoVazio && pecaAliada(peca, pecaDestino))
+    if (pecaDestino != espacoVazio && pecaAliada(peca, pecaDestino))
     {
-        snprintf(mensagemErro, sizeof(mensagemErro),"Movimento invalido, nao e possivel atacar pecas aliadas!");
+        snprintf(mensagemErro, sizeof(mensagemErro), "Movimento invalido, nao e possivel atacar pecas aliadas!");
         return;
     }
 
@@ -305,7 +343,7 @@ void moverPeca(int inicioX, int inicioY, int fimX, int fimY)
     {
         movimentoValido = moverRei(inicioX, inicioY, fimX, fimY);
     }
-    
+
     if (movimentoValido == 1)
     {
         turno++;
@@ -357,7 +395,7 @@ void obterMovimentoUsuario()
 
     if (turno % 2 == 0 && (peca == peaoPreto || peca == torrePreta || peca == cavaloPreto || peca == bispoPreto || peca == reiPreto || peca == damaPreta) || turno % 2 == 1 && (peca == peaoBranco || peca == torreBranca || peca == cavaloBranco || peca == bispoBranco || peca == reiBranco || peca == damaBranca))
     {
-        snprintf(mensagemErro, sizeof(mensagemErro),"Nao e o turno desta peca, tente novamente!");
+        snprintf(mensagemErro, sizeof(mensagemErro), "Nao e o turno desta peca, tente novamente!");
         return;
     }
 
@@ -367,7 +405,7 @@ void obterMovimentoUsuario()
     }
     else
     {
-        snprintf(mensagemErro, sizeof(mensagemErro),"Movimento invalido, tente novamente!");
+        snprintf(mensagemErro, sizeof(mensagemErro), "Movimento invalido, tente novamente!");
     }
 }
 
