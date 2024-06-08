@@ -169,8 +169,25 @@ int moverBispo(int inicioX, int inicioY, int fimX, int fimY)
 
 int moverTorre(int inicioX, int inicioY, int fimX, int fimY)
 {
-    // Valida se a torre continua na reta inicial (linha ou coluna) 
+    // Valida se a torre continua na reta inicial (linha ou coluna)
     if (inicioX == fimX || inicioY == fimY)
+    {
+        return 1;
+    }
+    else
+    {
+        printf("Movimento inválido. Tente novamente.\n");
+        return 0;
+    }
+}
+
+int moverDama(int inicioX, int inicioY, int fimX, int fimY)
+{
+    int casasAndadasX = fimX - inicioX;
+    int casasAndadasY = fimY - inicioY;
+
+    // Segue a combinação das regras do bispo e da torre
+    if ((inicioX == fimX || inicioY == fimY) || (casasAndadasX == casasAndadasY || casasAndadasX == -casasAndadasY))
     {
         return 1;
     }
@@ -212,6 +229,10 @@ void moverPeca(int inicioX, int inicioY, int fimX, int fimY)
     if (peca == torreBranca || peca == torrePreta)
     {
         movimentoValido = moverTorre(inicioX, inicioY, fimX, fimY);
+    }
+    if (peca == damaBranca || peca == damaPreta)
+    {
+        movimentoValido = moverDama(inicioX, inicioY, fimX, fimY);
     }
     if (movimentoValido == 1)
     {
