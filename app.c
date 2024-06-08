@@ -101,8 +101,15 @@ int posicaoValida(int x, int y)
 
 int moverPeaoBranco(int inicioX, int fimX)
 {
+    // Se a a posição/indice inicial for 6 E as casas andadas forem 1 ou 2, o movimento será válido.
     int casasAndadas = inicioX - fimX;
-    if(casasAndadas != 1){
+
+    if(inicioX == 6 && (casasAndadas == 1 || casasAndadas == 2)) 
+    {
+        return 1;
+    }
+    else if(casasAndadas != 1)
+    {
         printf("Movimento invalido. Tente novamente.\n");
         return 0;
     }  
@@ -113,7 +120,13 @@ int moverPeaoBranco(int inicioX, int fimX)
 int moverPeaoPreto(int inicioX, int fimX) 
 {
     int casasAndadas = inicioX - fimX;
-    if(casasAndadas != -1){
+
+    if(inicioX == 1 && (casasAndadas == -1 || casasAndadas == -2))
+    {
+        return 1;
+    }
+    else if(casasAndadas != -1)
+    {
         printf("Movimento invalido. Tente novamente.\n");
         return 0;
     }  
