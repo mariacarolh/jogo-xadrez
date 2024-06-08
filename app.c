@@ -112,6 +112,37 @@ int pecaAliada(char peca, char pecaDestino)
             (peca >= 'A' && peca <= 'Z' && pecaDestino >= 'A' && pecaDestino <= 'Z'));
 } 
 
+int caminhoLinhaColunaLivre(char inicioX, char inicioY, char fimX, char fimY)
+{
+    // Verifica se o caminho horizontal está livre
+    if (inicioX == fimX) 
+    {
+        // é necessário verificar todas as casas entre inicioX e fimX
+        // então verificamos qual dos dois é o menor (menorX) e qual é o maior (maiorX)
+        // e aí iteramos de menorX + 1 até maiorX - 1 para verificar se há alguma peça bloqueando o caminho.
+        int menorY = inicioY < fimY ? inicioY : fimY;
+        int maiorY = inicioY > fimY ? inicioY : fimY;
+
+        for (int y = menorY + 1; y < maiorY; y++) {
+            if (tabuleiro[inicioX][y] != espacoVazio) {
+                return 0; // Caminho bloqueado
+            }
+        }
+    }
+    if (inicioY == fimY)
+    {
+        int menorX = inicioX < fimX ? inicioX : fimX;
+        int maiorX = inicioX > fimX ? inicioX : fimX;
+
+        for (int x = menorX + 1; x < maiorX; x++) {
+            if (tabuleiro[x][inicioY] != espacoVazio) {
+                return 0;
+            }
+        }
+    }
+    return 1; //Caminho livre
+}
+
 int moverPeao(int inicioX, int fimX, char tipoPeca)
 {
     int casasAndadas = inicioX - fimX;
@@ -184,7 +215,7 @@ int moverBispo(int inicioX, int inicioY, int fimX, int fimY)
 int moverTorre(int inicioX, int inicioY, int fimX, int fimY)
 {
     // Valida se a torre continua na reta inicial (linha ou coluna)
-    if (inicioX == fimX || inicioY == fimY)
+    if (inicioX == fimX || inicioY == fimY && caminhoLinhaColunaLivre(inicioX, inicioY, fimX, fimY))
     {
         return 1;
     }
