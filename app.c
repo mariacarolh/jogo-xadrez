@@ -99,38 +99,35 @@ int posicaoValida(int x, int y)
     // Caso contrário, retorna false. Indicando uma posição não válida
 }
 
-int moverPeaoBranco(int inicioX, int fimX)
-{
-    // Se a a posição/indice inicial for 6 E as casas andadas forem 1 ou 2, o movimento será válido.
-    int casasAndadas = inicioX - fimX;
-
-    if(inicioX == 6 && (casasAndadas == 1 || casasAndadas == 2)) 
-    {
-        return 1;
-    }
-    else if(casasAndadas != 1)
-    {
-        printf("Movimento invalido. Tente novamente.\n");
-        return 0;
-    }  
-
-    return 1;
-}
-
-int moverPeaoPreto(int inicioX, int fimX) 
+int moverPeao(int inicioX, int fimX, char tipoPeca)
 {
     int casasAndadas = inicioX - fimX;
 
-    if(inicioX == 1 && (casasAndadas == -1 || casasAndadas == -2))
+    if(tipoPeca == peaoBranco)
     {
-        return 1;
+        if(inicioX == 6 && (casasAndadas == 1 || casasAndadas == 2)) 
+        {
+            return 1;
+        }
+        else if(casasAndadas != 1)
+        {
+            printf("Movimento invalido. Tente novamente.\n");
+            return 0;
+        }  
     }
-    else if(casasAndadas != -1)
+    else if(tipoPeca == peaoPreto)
     {
-        printf("Movimento invalido. Tente novamente.\n");
-        return 0;
-    }  
-
+        if(inicioX == 1 && (casasAndadas == -1 || casasAndadas == -2))
+        {
+            return 1;
+        }
+        else if(casasAndadas != -1)
+        {
+            printf("Movimento invalido. Tente novamente.\n");
+            return 0;
+        }  
+    }
+    
     return 1;
 }
 
@@ -148,11 +145,11 @@ void moverPeca(int inicioX, int inicioY, int fimX, int fimY)
 
     if(peca == peaoBranco)
     {
-        movimentoValido = moverPeaoBranco(inicioX, fimX);
+        movimentoValido = moverPeao(inicioX, fimX, peaoBranco);
     }
     if(peca == peaoPreto)
     {
-        movimentoValido = moverPeaoPreto(inicioX, fimX);
+        movimentoValido = moverPeao(inicioX, fimX, peaoPreto);
     }
 
     if(movimentoValido == 1)
