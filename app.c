@@ -1,9 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h> // Lib para limpar a tela
 
-#define TAM_TABULEIRO 8    // Tamanho padrão do tabuleiro
+#define TAM_TABULEIRO 8          // Tamanho padrão do tabuleiro
 #define MAGENTA "\x1b[38;5;200m" // Definindo a cor MAGENTA
-#define RESET "\x1B[0m"    // Reset de cor
+#define RESET "\x1B[0m"          // Reset de cor
 
 // Peças pretas
 const char peaoPreto = 'p';   // Peao
@@ -43,7 +43,7 @@ void exibirTabuleiro()
     for (int x = 0; x < TAM_TABULEIRO; x++) // x
     {
         printf("   ---------------------------------\n");
-        printf(" %d ", 8 - x);// Inserir coordenada Y na coluna (1 à 8)
+        printf(" %d ", 8 - x); // Inserir coordenada Y na coluna (1 à 8)
 
         for (int y = 0; y < TAM_TABULEIRO; y++) // y
         {
@@ -51,7 +51,7 @@ void exibirTabuleiro()
 
             if (peca == peaoPreto || peca == torrePreta || peca == cavaloPreto || peca == bispoPreto || peca == reiPreto || peca == damaPreta)
             {
-               printf("| " MAGENTA "%c" RESET " ", tabuleiro[x][y]);
+                printf("| " MAGENTA "%c" RESET " ", tabuleiro[x][y]);
             }
             else
             {
@@ -150,14 +150,32 @@ int moverCavalo(int inicioX, int inicioY, int fimX, int fimY)
     }
 }
 
-int moverBispo(int inicioX, int inicioY, int fimX, int fimY) {
+int moverBispo(int inicioX, int inicioY, int fimX, int fimY)
+{
     int casasAndadasX = fimX - inicioX;
     int casasAndadasY = fimY - inicioY;
 
     // Valida as casas entre as colunas e as linhas para verificar a diagonal
-    if (casasAndadasX == casasAndadasY || casasAndadasX == -casasAndadasY) {
+    if (casasAndadasX == casasAndadasY || casasAndadasX == -casasAndadasY)
+    {
         return 1;
-    } else {
+    }
+    else
+    {
+        printf("Movimento inválido. Tente novamente.\n");
+        return 0;
+    }
+}
+
+int moverTorre(int inicioX, int inicioY, int fimX, int fimY)
+{
+    // Valida se a torre continua na reta inicial (linha ou coluna) 
+    if (inicioX == fimX || inicioY == fimY)
+    {
+        return 1;
+    }
+    else
+    {
         printf("Movimento inválido. Tente novamente.\n");
         return 0;
     }
@@ -183,19 +201,18 @@ void moverPeca(int inicioX, int inicioY, int fimX, int fimY)
     {
         movimentoValido = moverPeao(inicioX, fimX, peaoPreto);
     }
-    if (peca == cavaloBranco)
+    if (peca == cavaloBranco || peca == cavaloPreto)
     {
         movimentoValido = moverCavalo(inicioX, inicioY, fimX, fimY);
     }
-    if (peca == cavaloPreto)
-    {
-        movimentoValido = moverCavalo(inicioX, inicioY, fimX, fimY);
-    }
-    if (peca == bispoBranco)
+    if (peca == bispoBranco || peca == bispoPreto)
     {
         movimentoValido = moverBispo(inicioX, inicioY, fimX, fimY);
     }
-
+    if (peca == torreBranca || peca == torrePreta)
+    {
+        movimentoValido = moverTorre(inicioX, inicioY, fimX, fimY);
+    }
     if (movimentoValido == 1)
     {
         turno++;
