@@ -607,10 +607,6 @@ void verificarCheques()
     {
         snprintf(mensagemErro, sizeof(mensagemErro), "Rei Preto esta em cheque!");
     }
-    else
-    {
-        mensagemErro[0] = '\0';
-    }
 }
 
 int main()
