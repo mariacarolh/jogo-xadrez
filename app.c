@@ -181,36 +181,56 @@ int caminhoDiagonalLivre(char inicioX, char inicioY, char fimX, char fimY)
     return 1;
 }
 
-int moverPeao(int inicioX, int fimX, char tipoPeca)
+int moverPeao(int inicioX, int inicioY, int fimX, int fimY, char tipoPeca)
 {
-    int casasAndadas = inicioX - fimX;
+    int casasAndadasX = inicioX - fimX;
+    int casasAndadasY = fimY - inicioY;
 
     if (tipoPeca == peaoBranco)
     {
-        if (inicioX == 6 && (casasAndadas == 1 || casasAndadas == 2))
+        if (inicioX == 6)
         {
-            return 1;
+            if (casasAndadasX == 1 && casasAndadasY == 0 && tabuleiro[fimX][fimY] == espacoVazio)
+            {
+                return 1;
+            }
+            if (casasAndadasX == 2 && casasAndadasY == 0 && tabuleiro[fimX][fimY] == espacoVazio && tabuleiro[fimX + 1][fimY] == espacoVazio)
+            {
+                return 1;
+            }
         }
-        else if (casasAndadas != 1)
+        else
         {
-            snprintf(mensagemErro, sizeof(mensagemErro), "Movimento invalido, tente novamente!");
-            return 0;
+            if (casasAndadasX == 1 && casasAndadasY == 0 && tabuleiro[fimX][fimY] == espacoVazio)
+            {
+                return 1;
+            }
         }
     }
     else if (tipoPeca == peaoPreto)
     {
-        if (inicioX == 1 && (casasAndadas == -1 || casasAndadas == -2))
+        if (inicioX == 1)
         {
-            return 1;
+            if (casasAndadasX == -1 && casasAndadasY == 0 && tabuleiro[fimX][fimY] == espacoVazio)
+            {
+                return 1;
+            }
+            if (casasAndadasX == -2 && casasAndadasY == 0 && tabuleiro[fimX][fimY] == espacoVazio && tabuleiro[fimX - 1][fimY] == espacoVazio)
+            {
+                return 1;
+            }
         }
-        else if (casasAndadas != -1)
+        else
         {
-            snprintf(mensagemErro, sizeof(mensagemErro), "Movimento invalido, tente novamente!");
-            return 0;
+            if (casasAndadasX == -1 && casasAndadasY == 0 && tabuleiro[fimX][fimY] == espacoVazio)
+            {
+                return 1;
+            }
         }
     }
 
-    return 1;
+    snprintf(mensagemErro, sizeof(mensagemErro), "Movimento invalido, tente novamente!");
+    return 0; // Movimento inválido
 }
 
 int moverCavalo(int inicioX, int inicioY, int fimX, int fimY)
@@ -301,7 +321,7 @@ void moverPeca(int inicioX, int inicioY, int fimX, int fimY)
 {
     char peca = tabuleiro[inicioX][inicioY];
     char pecaDestino = tabuleiro[fimX][fimY];
-    int movimentoValido;
+    int movimentoValido = 0;
 
     // Se a peça não for válida (A peça é a posição)
     if (!posicaoValida(inicioX, inicioY) || !posicaoValida(fimX, fimY))
@@ -317,29 +337,29 @@ void moverPeca(int inicioX, int inicioY, int fimX, int fimY)
 
     if (peca == peaoBranco)
     {
-        movimentoValido = moverPeao(inicioX, fimX, peaoBranco);
+        movimentoValido = moverPeao(inicioX, inicioY, fimX, fimY, peaoBranco);
     }
-    if (peca == peaoPreto)
+    else if (peca == peaoPreto)
     {
-        movimentoValido = moverPeao(inicioX, fimX, peaoPreto);
+        movimentoValido = moverPeao(inicioX, inicioY, fimX, fimY, peaoPreto);
     }
-    if (peca == cavaloBranco || peca == cavaloPreto)
+    else if (peca == cavaloBranco || peca == cavaloPreto)
     {
         movimentoValido = moverCavalo(inicioX, inicioY, fimX, fimY);
     }
-    if (peca == bispoBranco || peca == bispoPreto)
+    else if (peca == bispoBranco || peca == bispoPreto)
     {
         movimentoValido = moverBispo(inicioX, inicioY, fimX, fimY);
     }
-    if (peca == torreBranca || peca == torrePreta)
+    else if (peca == torreBranca || peca == torrePreta)
     {
         movimentoValido = moverTorre(inicioX, inicioY, fimX, fimY);
     }
-    if (peca == damaBranca || peca == damaPreta)
+    else if (peca == damaBranca || peca == damaPreta)
     {
         movimentoValido = moverDama(inicioX, inicioY, fimX, fimY);
     }
-    if (peca == reiBranco || peca == reiPreto)
+    else if (peca == reiBranco || peca == reiPreto)
     {
         movimentoValido = moverRei(inicioX, inicioY, fimX, fimY);
     }
@@ -351,12 +371,14 @@ void moverPeca(int inicioX, int inicioY, int fimX, int fimY)
         tabuleiro[fimX][fimY] = tabuleiro[inicioX][inicioY];
         // A posição inicial recebe um espaço vazio
         tabuleiro[inicioX][inicioY] = espacoVazio;
+        // Limpar mensagem de erro depois de um movimento válido
+        mensagemErro[0] = '\0';
     }
 }
 
 void obterMovimentoUsuario()
 {
-    // 3 por para caractere nulo de terminação
+    // 3 para caractere nulo de terminação
     char inicio[3];
     char fim[3];
 
@@ -370,10 +392,10 @@ void obterMovimentoUsuario()
     }
 
     printf("\nInsira a peca que sera movimentada: ");
-    scanf("%s", inicio);
+    scanf("%2s", inicio); //2s para ler uma string de no máximo dois caracteres
 
     printf("\nInsira para onde a peca sera movimentada: ");
-    scanf("%s", fim);
+    scanf("%2s", fim);
 
     int inicioY = inicio[0] - 'a';
     // Calcula a coordenada Y (coluna) da posição inicial
