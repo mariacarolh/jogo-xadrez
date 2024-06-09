@@ -185,15 +185,19 @@ int moverPeao(int inicioX, int inicioY, int fimX, int fimY, char tipoPeca)
 {
     int casasAndadasX = inicioX - fimX;
     int casasAndadasY = fimY - inicioY;
+    char pecaDestino = tabuleiro[fimX][fimY];
 
     if (tipoPeca == peaoBranco)
     {
+        // Verifica se o peão branco está na posição inicial
         if (inicioX == 6)
         {
+            // Movimento de uma casa para frente
             if (casasAndadasX == 1 && casasAndadasY == 0 && tabuleiro[fimX][fimY] == espacoVazio)
             {
                 return 1;
             }
+            // Movimento de duas casas para frente (apenas no primeiro movimento)
             if (casasAndadasX == 2 && casasAndadasY == 0 && tabuleiro[fimX][fimY] == espacoVazio && tabuleiro[fimX + 1][fimY] == espacoVazio)
             {
                 return 1;
@@ -201,20 +205,30 @@ int moverPeao(int inicioX, int inicioY, int fimX, int fimY, char tipoPeca)
         }
         else
         {
+            // Movimento de uma casa para frente
             if (casasAndadasX == 1 && casasAndadasY == 0 && tabuleiro[fimX][fimY] == espacoVazio)
             {
                 return 1;
             }
         }
+
+        // Movimento de captura na diagonal (caso não seja uma peça aliada)
+        if (casasAndadasX == 1 && (casasAndadasY == 1 || casasAndadasY == -1) && pecaDestino != espacoVazio && !pecaAliada(tipoPeca, pecaDestino))
+        {
+            return 1;
+        }
     }
     else if (tipoPeca == peaoPreto)
     {
+        // Verifica se o peão preto está na posição inicial
         if (inicioX == 1)
         {
+            // Movimento de uma casa para frente
             if (casasAndadasX == -1 && casasAndadasY == 0 && tabuleiro[fimX][fimY] == espacoVazio)
             {
                 return 1;
             }
+            // Movimento de duas casas para frente (apenas no primeiro movimento)
             if (casasAndadasX == -2 && casasAndadasY == 0 && tabuleiro[fimX][fimY] == espacoVazio && tabuleiro[fimX - 1][fimY] == espacoVazio)
             {
                 return 1;
@@ -222,10 +236,17 @@ int moverPeao(int inicioX, int inicioY, int fimX, int fimY, char tipoPeca)
         }
         else
         {
+            // Movimento de uma casa para frente
             if (casasAndadasX == -1 && casasAndadasY == 0 && tabuleiro[fimX][fimY] == espacoVazio)
             {
                 return 1;
             }
+        }
+
+        // Movimento de captura na diagonal
+        if (casasAndadasX == -1 && (casasAndadasY == 1 || casasAndadasY == -1) && pecaDestino != espacoVazio && !pecaAliada(tipoPeca, pecaDestino))
+        {
+            return 1;
         }
     }
 
@@ -392,7 +413,7 @@ void obterMovimentoUsuario()
     }
 
     printf("\nInsira a peca que sera movimentada: ");
-    scanf("%2s", inicio); //2s para ler uma string de no máximo dois caracteres
+    scanf("%2s", inicio); // 2s para ler uma string de no máximo dois caracteres
 
     printf("\nInsira para onde a peca sera movimentada: ");
     scanf("%2s", fim);
