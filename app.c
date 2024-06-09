@@ -183,6 +183,141 @@ int caminhoDiagonalLivre(char inicioX, char inicioY, char fimX, char fimY)
     return 1;
 }
 
+int verificarCheque(char rei, char adversarioPeao, char adversarioTorre, char adversarioCavalo, char adversarioBispo, char adversarioDama)
+{
+    int reiX, reiY;
+    for (int x = 0; x < TAM_TABULEIRO; x++)
+    {
+        for (int y = 0; y < TAM_TABULEIRO; y++)
+        {
+            if (tabuleiro[x][y] == rei)
+            {
+                reiX = x;
+                reiY = y;
+            }
+        }
+    }
+
+    // Verificar peões adversários
+    int direcaoPeao = (adversarioPeao == 'p') ? 1 : -1;
+    if (posicaoValida(reiX + direcaoPeao, reiY - 1) && tabuleiro[reiX + direcaoPeao][reiY - 1] == adversarioPeao)
+        return 1;
+    if (posicaoValida(reiX + direcaoPeao, reiY + 1) && tabuleiro[reiX + direcaoPeao][reiY + 1] == adversarioPeao)
+        return 1;
+
+    // Verificar cavalo adversário
+    int movimentosCavalo[8][2] = {{2, 1}, {2, -1}, {-2, 1}, {-2, -1}, {1, 2}, {1, -2}, {-1, 2}, {-1, -2}};
+    for (int i = 0; i < 8; i++)
+    {
+        int novoX = reiX + movimentosCavalo[i][0];
+        int novoY = reiY + movimentosCavalo[i][1];
+        if (posicaoValida(novoX, novoY) && tabuleiro[novoX][novoY] == adversarioCavalo)
+            return 1;
+    }
+
+    // Verificar linha/coluna (torre e dama)
+    for (int x = reiX + 1; x < TAM_TABULEIRO; x++)
+    {
+        if (tabuleiro[x][reiY] == adversarioTorre || tabuleiro[x][reiY] == adversarioDama)
+            return 1;
+        if (tabuleiro[x][reiY] != espacoVazio)
+            break;
+    }
+    for (int x = reiX - 1; x >= 0; x--)
+    {
+        if (tabuleiro[x][reiY] == adversarioTorre || tabuleiro[x][reiY] == adversarioDama)
+            return 1;
+        if (tabuleiro[x][reiY] != espacoVazio)
+            break;
+    }
+    for (int y = reiY + 1; y < TAM_TABULEIRO; y++)
+    {
+        if (tabuleiro[reiX][y] == adversarioTorre || tabuleiro[reiX][y] == adversarioDama)
+            return 1;
+        if (tabuleiro[reiX][y] != espacoVazio)
+            break;
+    }
+    for (int y = reiY - 1; y >= 0; y--)
+    {
+        if (tabuleiro[reiX][y] == adversarioTorre || tabuleiro[reiX][y] == adversarioDama)
+            return 1;
+        if (tabuleiro[reiX][y] != espacoVazio)
+            break;
+    }
+
+    // Verificar diagonais (bispo e dama)
+    for (int i = 1; posicaoValida(reiX + i, reiY + i); i++)
+    {
+        if (tabuleiro[reiX + i][reiY + i] == adversarioBispo || tabuleiro[reiX + i][reiY + i] == adversarioDama)
+            return 1;
+        if (tabuleiro[reiX + i][reiY + i] != espacoVazio)
+            break;
+    }
+    for (int i = 1; posicaoValida(reiX - i, reiY - i); i++)
+    {
+        if (tabuleiro[reiX - i][reiY - i] == adversarioBispo || tabuleiro[reiX - i][reiY - i] == adversarioDama)
+            return 1;
+        if (tabuleiro[reiX - i][reiY - i] != espacoVazio)
+            break;
+    }
+    for (int i = 1; posicaoValida(reiX + i, reiY - i); i++)
+    {
+        if (tabuleiro[reiX + i][reiY - i] == adversarioBispo || tabuleiro[reiX + i][reiY - i] == adversarioDama)
+            return 1;
+        if (tabuleiro[reiX + i][reiY - i] != espacoVazio)
+            break;
+    }
+    for (int i = 1; posicaoValida(reiX - i, reiY + i); i++)
+    {
+        if (tabuleiro[reiX - i][reiY + i] == adversarioBispo || tabuleiro[reiX - i][reiY + i] == adversarioDama)
+            return 1;
+        if (tabuleiro[reiX - i][reiY + i] != espacoVazio)
+            break;
+    }
+
+    return 0;
+}
+
+void verificarCheques()
+{
+    if (verificarCheque(reiBranco, peaoPreto, torrePreta, cavaloPreto, bispoPreto, damaPreta))
+    {
+        snprintf(mensagemErro, sizeof(mensagemErro), "Rei Branco esta em cheque!");
+    }
+    else if (verificarCheque(reiPreto, peaoBranco, torreBranca, cavaloBranco, bispoBranco, damaBranca))
+    {
+        snprintf(mensagemErro, sizeof(mensagemErro), "Rei Preto esta em cheque!");
+    }
+}
+
+int impedirTraicao(int inicioX, int inicioY, int fimX, int fimY)
+{
+    char pecaOrigem = tabuleiro[inicioX][inicioY];
+    char pecaDestino = tabuleiro[fimX][fimY];
+    
+    // Simula o movimento
+    tabuleiro[fimX][fimY] = pecaOrigem;
+    tabuleiro[inicioX][inicioY] = espacoVazio;
+    
+    // Verifica se o movimento deixa o rei em cheque
+    int cheque = 0;
+    if (pecaOrigem >= 'a' && pecaOrigem <= 'z') // Peça preta
+    {
+        cheque = verificarCheque(reiPreto, peaoBranco, torreBranca, cavaloBranco, bispoBranco, damaBranca);
+    }
+    else if (pecaOrigem >= 'A' && pecaOrigem <= 'Z') // Peça branca
+    {
+        cheque = verificarCheque(reiBranco, peaoPreto, torrePreta, cavaloPreto, bispoPreto, damaPreta);
+    }
+    
+    // Reverte o movimento
+    tabuleiro[inicioX][inicioY] = pecaOrigem;
+    tabuleiro[fimX][fimY] = pecaDestino;
+    
+    return cheque;
+}
+
+
 int moverPeao(int inicioX, int inicioY, int fimX, int fimY, char tipoPeca)
 {
     int casasAndadasX = inicioX - fimX;
@@ -399,6 +534,11 @@ void moverPeca(int inicioX, int inicioY, int fimX, int fimY)
         snprintf(mensagemErro, sizeof(mensagemErro), "Movimento invalido, nao e possivel atacar pecas aliadas!");
         return;
     }
+    if (impedirTraicao(inicioX, inicioY, fimX, fimY))
+    {
+        snprintf(mensagemErro, sizeof(mensagemErro), "Movimento invalido, nao e permitido deixar o rei em cheque!");
+        return;
+    }
 
     if (peca == peaoBranco)
     {
@@ -446,6 +586,7 @@ void moverPeca(int inicioX, int inicioY, int fimX, int fimY)
         }
     }
 }
+
 
 void obterMovimentoUsuario()
 {
@@ -499,113 +640,6 @@ void obterMovimentoUsuario()
     else
     {
         snprintf(mensagemErro, sizeof(mensagemErro), "Movimento invalido, tente novamente!");
-    }
-}
-
-int verificarCheque(char rei, char adversarioPeao, char adversarioTorre, char adversarioCavalo, char adversarioBispo, char adversarioDama)
-{
-    int reiX, reiY;
-    for (int x = 0; x < TAM_TABULEIRO; x++)
-    {
-        for (int y = 0; y < TAM_TABULEIRO; y++)
-        {
-            if (tabuleiro[x][y] == rei)
-            {
-                reiX = x;
-                reiY = y;
-            }
-        }
-    }
-
-    // Verificar peões adversários
-    int direcaoPeao = (adversarioPeao == 'p') ? 1 : -1;
-    if (posicaoValida(reiX + direcaoPeao, reiY - 1) && tabuleiro[reiX + direcaoPeao][reiY - 1] == adversarioPeao)
-        return 1;
-    if (posicaoValida(reiX + direcaoPeao, reiY + 1) && tabuleiro[reiX + direcaoPeao][reiY + 1] == adversarioPeao)
-        return 1;
-
-    // Verificar cavalo adversário
-    int movimentosCavalo[8][2] = {{2, 1}, {2, -1}, {-2, 1}, {-2, -1}, {1, 2}, {1, -2}, {-1, 2}, {-1, -2}};
-    for (int i = 0; i < 8; i++)
-    {
-        int novoX = reiX + movimentosCavalo[i][0];
-        int novoY = reiY + movimentosCavalo[i][1];
-        if (posicaoValida(novoX, novoY) && tabuleiro[novoX][novoY] == adversarioCavalo)
-            return 1;
-    }
-
-    // Verificar linha/coluna (torre e dama)
-    for (int x = reiX + 1; x < TAM_TABULEIRO; x++)
-    {
-        if (tabuleiro[x][reiY] == adversarioTorre || tabuleiro[x][reiY] == adversarioDama)
-            return 1;
-        if (tabuleiro[x][reiY] != espacoVazio)
-            break;
-    }
-    for (int x = reiX - 1; x >= 0; x--)
-    {
-        if (tabuleiro[x][reiY] == adversarioTorre || tabuleiro[x][reiY] == adversarioDama)
-            return 1;
-        if (tabuleiro[x][reiY] != espacoVazio)
-            break;
-    }
-    for (int y = reiY + 1; y < TAM_TABULEIRO; y++)
-    {
-        if (tabuleiro[reiX][y] == adversarioTorre || tabuleiro[reiX][y] == adversarioDama)
-            return 1;
-        if (tabuleiro[reiX][y] != espacoVazio)
-            break;
-    }
-    for (int y = reiY - 1; y >= 0; y--)
-    {
-        if (tabuleiro[reiX][y] == adversarioTorre || tabuleiro[reiX][y] == adversarioDama)
-            return 1;
-        if (tabuleiro[reiX][y] != espacoVazio)
-            break;
-    }
-
-    // Verificar diagonais (bispo e dama)
-    for (int i = 1; posicaoValida(reiX + i, reiY + i); i++)
-    {
-        if (tabuleiro[reiX + i][reiY + i] == adversarioBispo || tabuleiro[reiX + i][reiY + i] == adversarioDama)
-            return 1;
-        if (tabuleiro[reiX + i][reiY + i] != espacoVazio)
-            break;
-    }
-    for (int i = 1; posicaoValida(reiX - i, reiY - i); i++)
-    {
-        if (tabuleiro[reiX - i][reiY - i] == adversarioBispo || tabuleiro[reiX - i][reiY - i] == adversarioDama)
-            return 1;
-        if (tabuleiro[reiX - i][reiY - i] != espacoVazio)
-            break;
-    }
-    for (int i = 1; posicaoValida(reiX + i, reiY - i); i++)
-    {
-        if (tabuleiro[reiX + i][reiY - i] == adversarioBispo || tabuleiro[reiX + i][reiY - i] == adversarioDama)
-            return 1;
-        if (tabuleiro[reiX + i][reiY - i] != espacoVazio)
-            break;
-    }
-    for (int i = 1; posicaoValida(reiX - i, reiY + i); i++)
-    {
-        if (tabuleiro[reiX - i][reiY + i] == adversarioBispo || tabuleiro[reiX - i][reiY + i] == adversarioDama)
-            return 1;
-        if (tabuleiro[reiX - i][reiY + i] != espacoVazio)
-            break;
-    }
-
-    return 0;
-}
-
-void verificarCheques()
-{
-    if (verificarCheque(reiBranco, peaoPreto, torrePreta, cavaloPreto, bispoPreto, damaPreta))
-    {
-        snprintf(mensagemErro, sizeof(mensagemErro), "Rei Branco esta em cheque!");
-    }
-    else if (verificarCheque(reiPreto, peaoBranco, torreBranca, cavaloBranco, bispoBranco, damaBranca))
-    {
-        snprintf(mensagemErro, sizeof(mensagemErro), "Rei Preto esta em cheque!");
     }
 }
 
