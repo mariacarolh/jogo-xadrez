@@ -4,6 +4,7 @@
 #define TAM_TABULEIRO 8          // Tamanho padrão do tabuleiro
 #define MAGENTA "\x1b[38;5;200m" // Definindo a cor rosa
 #define VERMELHO "\x1b[38;5;9m"  // Definindo a cor vermelha
+#define AMARELO "\x1b[38;5;226m" // Definindo a cor amarela
 #define RESET "\x1B[0m"          // Reset de cor
 
 // Peças pretas
@@ -83,7 +84,8 @@ void iniciarTabuleiro()
             {espacoVazio, espacoVazio, espacoVazio, espacoVazio, espacoVazio, espacoVazio, espacoVazio, espacoVazio},
             {espacoVazio, espacoVazio, espacoVazio, espacoVazio, espacoVazio, espacoVazio, espacoVazio, espacoVazio},
             {peaoBranco, peaoBranco, peaoBranco, peaoBranco, peaoBranco, peaoBranco, peaoBranco, peaoBranco},
-            {torreBranca, cavaloBranco, bispoBranco, damaBranca, reiBranco, bispoBranco, cavaloBranco, torreBranca}};
+            {torreBranca, cavaloBranco, bispoBranco, damaBranca, reiBranco, bispoBranco, cavaloBranco, torreBranca}
+        };
 
     for (int x = 0; x < TAM_TABULEIRO; x++)
     {
@@ -254,6 +256,50 @@ int moverPeao(int inicioX, int inicioY, int fimX, int fimY, char tipoPeca)
     return 0; // Movimento inválido
 }
 
+void promoverPeao(int x, int y, char tipoPeca)
+{
+    char novaPeca;
+    int pecaValida = 0;
+
+    // Equanto não for escolhido uma peça válida entre as opções, o jogo não irá prosseguir
+    while (!pecaValida)
+    {
+        printf(AMARELO "Promocao! Escolha a nova peca \n D - Dama\n T - Torre\n B - Bispo\n C - Cavalo: " RESET);
+        scanf(" %c", &novaPeca);
+
+        switch (novaPeca)
+        {
+            case 'D':
+            case 'd':
+                novaPeca = (tipoPeca == peaoBranco) ? damaBranca : damaPreta;
+                pecaValida = 1;
+                break;
+            case 'T':
+            case 't':
+                novaPeca = (tipoPeca == peaoBranco) ? torreBranca : torrePreta;
+                pecaValida = 1;
+                break;
+            case 'B':
+            case 'b':
+                novaPeca = (tipoPeca == peaoBranco) ? bispoBranco : bispoPreto;
+                pecaValida = 1;
+                break;
+            case 'C':
+            case 'c':
+                novaPeca = (tipoPeca == peaoBranco) ? cavaloBranco : cavaloPreto;
+                pecaValida = 1;
+                break;
+            default:
+                printf(VERMELHO "Entrada invalida! Tente novamente.\n" RESET);
+                break;
+        }
+    }
+    // Peça atual vira peça escolhida
+    tabuleiro[x][y] = novaPeca;
+}
+
+
+
 int moverCavalo(int inicioX, int inicioY, int fimX, int fimY)
 {
     int casasAndadasX = fimX - inicioX;
@@ -394,6 +440,12 @@ void moverPeca(int inicioX, int inicioY, int fimX, int fimY)
         tabuleiro[inicioX][inicioY] = espacoVazio;
         // Limpar mensagem de erro depois de um movimento válido
         mensagemErro[0] = '\0';
+
+        // Verifica se um peão chegou ao fim do tabuleiro para promover
+        if ((peca == peaoBranco && fimX == 0) || (peca == peaoPreto && fimX == 7))
+        {
+            promoverPeao(fimX, fimY, peca);
+        }
     }
 }
 
