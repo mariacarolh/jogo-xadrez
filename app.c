@@ -4,7 +4,9 @@
 #define TAM_TABULEIRO 8          // Tamanho padrão do tabuleiro
 #define MAGENTA "\x1b[38;5;200m" // Definindo a cor rosa
 #define VERMELHO "\x1b[38;5;9m"  // Definindo a cor vermelha
+#define VERMELHO_ESCURO "\x1b[38;5;1m" //Definindo a cor vermelho escuro
 #define AMARELO "\x1b[38;5;226m" // Definindo a cor amarela
+#define VERDE "\x1b[38;5;46m"   // Definindo a cor verde
 #define RESET "\x1B[0m"          // Reset de cor
 
 // Peças pretas
@@ -67,7 +69,7 @@ void exibirTabuleiro()
 
     if (mensagemErro[0] != '\0') // Se a mensagem de erro não estiver vazia será exibido o aviso
     {
-        printf("\nErro: " VERMELHO "%s\n" RESET, mensagemErro);
+        printf("\n" VERMELHO "  %s\n" RESET, mensagemErro);
     }
 }
 
@@ -278,15 +280,82 @@ int verificarCheque(char rei, char adversarioPeao, char adversarioTorre, char ad
     return 0;
 }
 
+int verificarChequeMate(char rei, char adversarioPeao, char adversarioTorre, char adversarioCavalo, char adversarioBispo, char adversarioDama)
+{
+    int reiX, reiY;
+    for (int x = 0; x < TAM_TABULEIRO; x++)
+    {
+        for (int y = 0; y < TAM_TABULEIRO; y++)
+        {
+            if (tabuleiro[x][y] == rei)
+            {
+                reiX = x;
+                reiY = y;
+                break;
+            }
+        }
+    }
+
+    // Verificar todos os movimentos possíveis do rei
+    for (int i = -1; i <= 1; i++)
+    {
+        for (int j = -1; j <= 1; j++)
+        {
+            if (i == 0 && j == 0)
+                continue;
+
+            int novoX = reiX + i;
+            int novoY = reiY + j;
+
+            if (posicaoValida(novoX, novoY) && !pecaAliada(rei, tabuleiro[novoX][novoY]))
+            {
+                // Simula o movimento
+                char pecaOrigem = tabuleiro[novoX][novoY];
+                tabuleiro[novoX][novoY] = rei;
+                tabuleiro[reiX][reiY] = espacoVazio;
+
+                // Verifica se o rei ainda está em cheque
+                int cheque = verificarCheque(rei, adversarioPeao, adversarioTorre, adversarioCavalo, adversarioBispo, adversarioDama);
+
+                // Reverte o movimento
+                tabuleiro[reiX][reiY] = rei;
+                tabuleiro[novoX][novoY] = pecaOrigem;
+
+                if (!cheque)
+                {
+                    return 0; // O rei pode escapar do cheque
+                }
+            }
+        }
+    }
+
+    // Se nenhum movimento é possível para sair do cheque
+    return 1;
+}
+
 void verificarCheques()
 {
     if (verificarCheque(reiBranco, peaoPreto, torrePreta, cavaloPreto, bispoPreto, damaPreta))
     {
-        snprintf(mensagemErro, sizeof(mensagemErro), "Rei Branco esta em cheque!");
+        if (verificarChequeMate(reiBranco, peaoPreto, torrePreta, cavaloPreto, bispoPreto, damaPreta))
+        {
+            snprintf(mensagemErro, sizeof(mensagemErro), RESET VERDE "Rei Branco esta em cheque-mate! Pretas ganham!" RESET);
+        }
+        else
+        {
+            snprintf(mensagemErro, sizeof(mensagemErro), RESET VERMELHO_ESCURO "Rei Branco esta em cheque!" RESET);
+        }
     }
     else if (verificarCheque(reiPreto, peaoBranco, torreBranca, cavaloBranco, bispoBranco, damaBranca))
     {
-        snprintf(mensagemErro, sizeof(mensagemErro), "Rei Preto esta em cheque!");
+        if (verificarChequeMate(reiPreto, peaoBranco, torreBranca, cavaloBranco, bispoBranco, damaBranca))
+        {
+            snprintf(mensagemErro, sizeof(mensagemErro), RESET VERDE "Rei Preto esta em cheque-mate! Brancas ganham!" RESET);
+        }
+        else
+        {
+            snprintf(mensagemErro, sizeof(mensagemErro), RESET VERMELHO_ESCURO "Rei Preto esta em cheque!" RESET);
+        }
     }
 }
 
