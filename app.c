@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h> // Lib para limpar a tela
+#include <string.h> // lib para que seja possivel comparar strings
 
 #define TAM_TABULEIRO 8                // Tamanho padrão do tabuleiro
 #define MAGENTA "\x1b[38;5;200m"       // Definindo a cor rosa
@@ -648,10 +649,26 @@ void obterMovimentoUsuario()
     }
 
     printf("\nInsira a peca que sera movimentada: ");
-    scanf("%2s", inicio); // 2s para ler uma string de no máximo dois caracteres
+    scanf("%2s", inicio);
+    inicio[2] = '\0'; // Garante que a string está terminada com o caractere nulo
+
+    // Usa strcmp para comparar as strings
+    if (strcmp(inicio, "sa") == 0)
+    {
+        jogoContinua = 0;
+        return;
+    }
 
     printf("\nInsira para onde a peca sera movimentada: ");
     scanf("%2s", fim);
+    fim[2] = '\0'; // Garante que a string está terminada com o caractere nulo
+
+    // Usa strcmp para comparar as strings
+    if (strcmp(fim, "sa") == 0)
+    {
+        jogoContinua = 0;
+        return;
+    }
 
     int inicioY = inicio[0] - 'a';
     // Calcula a coordenada Y (coluna) da posição inicial
@@ -725,7 +742,6 @@ void verificarCheques()
     }
 }
 
-
 void iniciarJogo()
 {
     iniciarTabuleiro();
@@ -762,15 +778,30 @@ void exibirPontuacao()
 void exibirRegras()
 {
     limparTela();
-    
+    printf(" Regras basicas de como jogar:\n");
+    printf(" -----------------------------\n\n");
+
+    printf(" Primeiramente para conseguir jogar, sera necessario que ja tenha um conhecimento previo em xadrez.\n\n");
+    printf(" -----------------------------\n");
+    printf(" Os movimentos do jogo funcionam da seguinte maneira:\n");
+    printf(" Ha dois comandos para movimentar uma peca\n");
+    printf(" O primeiro para dizer qual peca sera movida e o segundo para onde ela ira\n\n");
+    printf(" Primeiro sempre digite a letra que equivale a coluna, ou seja o " AMARELO "Y\n" RESET);
+    printf(" Em seguida digite a letra que equivale a linha, ou seja o " AMARELO "X\n" RESET);
+    printf(" Exemplo: " AMARELO "a2" RESET ", " AMARELO "h5" RESET ", " AMARELO "f8" RESET "\n");
+    printf(" -----------------------------\n\n");
+    printf(" Caso queira sair do jogo, digite" VERMELHO " 'sa' " RESET "a qualquer momento\n");
+    printf(" A partida sera cancelada, nenhum dos jogadores ira ganhar" VERDE " pontos de vitoria\n\n" RESET);
     printf(" Digite qualquer tecla para retornar ao menu\n");
     getchar();
     getchar();
 }
 
-void menu() {
+void menu()
+{
     limparTela();
-    while (1) {
+    while (1)
+    {
         limparTela();
         printf(" _______________________________\n");
         printf(" __  __         _              \n");
@@ -787,41 +818,45 @@ void menu() {
         printf(" -----------------------------\n");
         printf(" 2 - Ver placar atual\n");
         printf(" -----------------------------\n");
-        printf(" 3 - Regras \n");
+        printf(" 3 - Regras basicas \n");
         printf(" -----------------------------\n");
         printf(" 4 - Sair\n");
 
         printf("\n Opcao: ");
 
         // Verifica se a entrada é um número
-        if (scanf("%d", &opcao) != 1) {
+        if (scanf("%d", &opcao) != 1)
+        {
             // Limpa o buffer de entrada
-            while (getchar() != '\n');
+            while (getchar() != '\n')
+                ;
             continue; // Volta ao início do loop
         }
 
-        switch (opcao) {
-            case 1:
-                jogoContinua = 1;
-                turno = 0;
-                iniciarJogo();
-                break;
-            case 2:
-                exibirPontuacao();
-                break;
-            case 3:
-                exibirRegras();
-                break;
-            case 4:
-                printf(VERDE "\nObrigado por jogar, ate mais!\n" RESET);
-                exit(0);
-            default:
-                break;
+        switch (opcao)
+        {
+        case 1:
+            jogoContinua = 1;
+            turno = 0;
+            iniciarJogo();
+            break;
+        case 2:
+            exibirPontuacao();
+            break;
+        case 3:
+            exibirRegras();
+            break;
+        case 4:
+            printf(VERDE "\nObrigado por jogar, ate mais!\n" RESET);
+            exit(0);
+        default:
+            break;
         }
     }
 }
 
-int main() {
+int main()
+{
     menu();
     return 0;
 }
