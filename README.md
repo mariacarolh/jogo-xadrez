@@ -6,5 +6,5 @@
 
 Criado por:
 
-Gabriel Vismeck
+Gabriel Vismeck e
 Maria Carolina
