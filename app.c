@@ -30,6 +30,7 @@ const char reiBranco = 'R';    // Rei
 int turno = 0;         // Variável para turnos (0 brancas e 1 pretas)
 int pontosBrancas = 0; // Variável para pontos das peças brancas
 int pontosPretas = 0;  // Variável para pontos das peças pretas
+int jogoContinua = 1;
 
 char mensagemErro[100] = "";                  // Mensagens de erros
 char tabuleiro[TAM_TABULEIRO][TAM_TABULEIRO]; // Definir tamanho do tabuleiro 8 por 8
@@ -333,34 +334,6 @@ int verificarChequeMate(char rei, char adversarioPeao, char adversarioTorre, cha
 
     // Se nenhum movimento é possível para sair do cheque
     return 1;
-}
-
-void verificarCheques()
-{
-    if (verificarCheque(reiBranco, peaoPreto, torrePreta, cavaloPreto, bispoPreto, damaPreta))
-    {
-        if (verificarChequeMate(reiBranco, peaoPreto, torrePreta, cavaloPreto, bispoPreto, damaPreta))
-        {
-            snprintf(mensagemErro, sizeof(mensagemErro), RESET VERDE "Rei Branco esta em cheque-mate! Pretas ganham!" RESET);
-            pontosPretas++;
-        }
-        else
-        {
-            snprintf(mensagemErro, sizeof(mensagemErro), RESET VERMELHO_ESCURO "Rei Branco esta em cheque!" RESET);
-        }
-    }
-    else if (verificarCheque(reiPreto, peaoBranco, torreBranca, cavaloBranco, bispoBranco, damaBranca))
-    {
-        if (verificarChequeMate(reiPreto, peaoBranco, torreBranca, cavaloBranco, bispoBranco, damaBranca))
-        {
-            snprintf(mensagemErro, sizeof(mensagemErro), RESET VERDE "Rei Preto esta em cheque-mate! Brancas ganham!" RESET);
-            pontosBrancas++;
-        }
-        else
-        {
-            snprintf(mensagemErro, sizeof(mensagemErro), RESET VERMELHO_ESCURO "Rei Preto esta em cheque!" RESET);
-        }
-    }
 }
 
 int impedirTraicao(int inicioX, int inicioY, int fimX, int fimY)
@@ -714,17 +687,60 @@ void obterMovimentoUsuario()
     }
 }
 
+void verificarCheques()
+{
+    if (verificarCheque(reiBranco, peaoPreto, torrePreta, cavaloPreto, bispoPreto, damaPreta))
+    {
+        if (verificarChequeMate(reiBranco, peaoPreto, torrePreta, cavaloPreto, bispoPreto, damaPreta))
+        {
+            exibirTabuleiro();
+            printf(VERDE "Rei Branco esta em cheque-mate! Pretas ganham!" RESET);
+            printf("\n Pressione qualquer tecla para voltar ao menu...\n");
+            getchar();
+            getchar();
+            pontosPretas++;
+            jogoContinua = 0;
+        }
+        else
+        {
+            snprintf(mensagemErro, sizeof(mensagemErro), RESET VERMELHO_ESCURO "Rei Branco esta em cheque!" RESET);
+        }
+    }
+    else if (verificarCheque(reiPreto, peaoBranco, torreBranca, cavaloBranco, bispoBranco, damaBranca))
+    {
+        if (verificarChequeMate(reiPreto, peaoBranco, torreBranca, cavaloBranco, bispoBranco, damaBranca))
+        {
+            exibirTabuleiro();
+            printf(VERDE "\nRei Branco esta em cheque-mate! Pretas ganham!\n" RESET);
+            printf("\n Pressione qualquer tecla para voltar ao menu...\n");
+            getchar();
+            getchar();
+            pontosBrancas++;
+            jogoContinua = 0;
+        }
+        else
+        {
+            snprintf(mensagemErro, sizeof(mensagemErro), RESET VERMELHO_ESCURO "Rei Preto esta em cheque!" RESET);
+        }
+    }
+}
+
+
 void iniciarJogo()
 {
     iniciarTabuleiro();
     exibirTabuleiro();
     printf("\n");
-    while (1)
+    while (jogoContinua)
     {
         obterMovimentoUsuario();
         verificarCheques();
         exibirTabuleiro();
         printf("\n");
+        if (!jogoContinua) // Se o jogo não continuar volta ao menu;
+        {
+            break;
+        }
     }
 }
 
@@ -735,18 +751,26 @@ void exibirPontuacao()
     printf(" -----------------------------\n");
     printf(" Brancas: %d\n", pontosBrancas);
     printf(" -----------------------------\n");
-    printf(MAGENTA " Pretas" RESET ":%d\n", pontosPretas);
+    printf(MAGENTA " Pretas" RESET ": %d\n", pontosPretas);
     printf(" -----------------------------\n\n");
 
     printf(" Digite qualquer tecla para retornar ao menu\n");
     getchar();
     getchar();
 }
-void menu()
+
+void exibirRegras()
 {
     limparTela();
-    while (1)
-    {
+    
+    printf(" Digite qualquer tecla para retornar ao menu\n");
+    getchar();
+    getchar();
+}
+
+void menu() {
+    limparTela();
+    while (1) {
         limparTela();
         printf(" _______________________________\n");
         printf(" __  __         _              \n");
@@ -768,22 +792,36 @@ void menu()
         printf(" 4 - Sair\n");
 
         printf("\n Opcao: ");
-        scanf("%d", &opcao);
 
-        switch (opcao)
-        {
-        case 1:
-            iniciarJogo();
-        case 2:
-            exibirPontuacao();
-        case 4:
-            printf(VERDE "\nObrigado por jogar, ate mais!\n" RESET);
-            exit(0);
+        // Verifica se a entrada é um número
+        if (scanf("%d", &opcao) != 1) {
+            // Limpa o buffer de entrada
+            while (getchar() != '\n');
+            continue; // Volta ao início do loop
+        }
+
+        switch (opcao) {
+            case 1:
+                jogoContinua = 1;
+                turno = 0;
+                iniciarJogo();
+                break;
+            case 2:
+                exibirPontuacao();
+                break;
+            case 3:
+                exibirRegras();
+                break;
+            case 4:
+                printf(VERDE "\nObrigado por jogar, ate mais!\n" RESET);
+                exit(0);
+            default:
+                break;
         }
     }
 }
 
-int main()
-{
+int main() {
     menu();
+    return 0;
 }
