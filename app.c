@@ -1,13 +1,13 @@
 #include <stdio.h>
 #include <stdlib.h> // Lib para limpar a tela
 
-#define TAM_TABULEIRO 8          // Tamanho padrão do tabuleiro
-#define MAGENTA "\x1b[38;5;200m" // Definindo a cor rosa
-#define VERMELHO "\x1b[38;5;9m"  // Definindo a cor vermelha
-#define VERMELHO_ESCURO "\x1b[38;5;1m" //Definindo a cor vermelho escuro
-#define AMARELO "\x1b[38;5;226m" // Definindo a cor amarela
-#define VERDE "\x1b[38;5;46m"   // Definindo a cor verde
-#define RESET "\x1B[0m"          // Reset de cor
+#define TAM_TABULEIRO 8                // Tamanho padrão do tabuleiro
+#define MAGENTA "\x1b[38;5;200m"       // Definindo a cor rosa
+#define VERMELHO "\x1b[38;5;9m"        // Definindo a cor vermelha
+#define VERMELHO_ESCURO "\x1b[38;5;1m" // Definindo a cor vermelho escuro
+#define AMARELO "\x1b[38;5;226m"       // Definindo a cor amarela
+#define VERDE "\x1b[38;5;46m"          // Definindo a cor verde
+#define RESET "\x1B[0m"                // Reset de cor
 
 // Peças pretas
 const char peaoPreto = 'p';   // Peao
@@ -27,7 +27,10 @@ const char bispoBranco = 'B';  // Bispo
 const char damaBranca = 'D';   // Dama
 const char reiBranco = 'R';    // Rei
 
-int turno = 0;                                // Variável para turnos (0 brancas e 1 pretas)
+int turno = 0;         // Variável para turnos (0 brancas e 1 pretas)
+int pontosBrancas = 0; // Variável para pontos das peças brancas
+int pontosPretas = 0;  // Variável para pontos das peças pretas
+
 char mensagemErro[100] = "";                  // Mensagens de erros
 char tabuleiro[TAM_TABULEIRO][TAM_TABULEIRO]; // Definir tamanho do tabuleiro 8 por 8
 
@@ -86,8 +89,7 @@ void iniciarTabuleiro()
             {espacoVazio, espacoVazio, espacoVazio, espacoVazio, espacoVazio, espacoVazio, espacoVazio, espacoVazio},
             {espacoVazio, espacoVazio, espacoVazio, espacoVazio, espacoVazio, espacoVazio, espacoVazio, espacoVazio},
             {peaoBranco, peaoBranco, peaoBranco, peaoBranco, peaoBranco, peaoBranco, peaoBranco, peaoBranco},
-            {torreBranca, cavaloBranco, bispoBranco, damaBranca, reiBranco, bispoBranco, cavaloBranco, torreBranca}
-        };
+            {torreBranca, cavaloBranco, bispoBranco, damaBranca, reiBranco, bispoBranco, cavaloBranco, torreBranca}};
 
     for (int x = 0; x < TAM_TABULEIRO; x++)
     {
@@ -340,6 +342,7 @@ void verificarCheques()
         if (verificarChequeMate(reiBranco, peaoPreto, torrePreta, cavaloPreto, bispoPreto, damaPreta))
         {
             snprintf(mensagemErro, sizeof(mensagemErro), RESET VERDE "Rei Branco esta em cheque-mate! Pretas ganham!" RESET);
+            pontosPretas++;
         }
         else
         {
@@ -351,6 +354,7 @@ void verificarCheques()
         if (verificarChequeMate(reiPreto, peaoBranco, torreBranca, cavaloBranco, bispoBranco, damaBranca))
         {
             snprintf(mensagemErro, sizeof(mensagemErro), RESET VERDE "Rei Preto esta em cheque-mate! Brancas ganham!" RESET);
+            pontosBrancas++;
         }
         else
         {
@@ -363,11 +367,11 @@ int impedirTraicao(int inicioX, int inicioY, int fimX, int fimY)
 {
     char pecaOrigem = tabuleiro[inicioX][inicioY];
     char pecaDestino = tabuleiro[fimX][fimY];
-    
+
     // Simula o movimento
     tabuleiro[fimX][fimY] = pecaOrigem;
     tabuleiro[inicioX][inicioY] = espacoVazio;
-    
+
     // Verifica se o movimento deixa o rei em cheque
     int cheque = 0;
     if (pecaOrigem >= 'a' && pecaOrigem <= 'z') // Peça preta
@@ -378,14 +382,13 @@ int impedirTraicao(int inicioX, int inicioY, int fimX, int fimY)
     {
         cheque = verificarCheque(reiBranco, peaoPreto, torrePreta, cavaloPreto, bispoPreto, damaPreta);
     }
-    
+
     // Reverte o movimento
     tabuleiro[inicioX][inicioY] = pecaOrigem;
     tabuleiro[fimX][fimY] = pecaDestino;
-    
+
     return cheque;
 }
-
 
 int moverPeao(int inicioX, int inicioY, int fimX, int fimY, char tipoPeca)
 {
@@ -473,29 +476,29 @@ void promoverPeao(int x, int y, char tipoPeca)
 
         switch (novaPeca)
         {
-            case 'D':
-            case 'd':
-                novaPeca = (tipoPeca == peaoBranco) ? damaBranca : damaPreta;
-                pecaValida = 1;
-                break;
-            case 'T':
-            case 't':
-                novaPeca = (tipoPeca == peaoBranco) ? torreBranca : torrePreta;
-                pecaValida = 1;
-                break;
-            case 'B':
-            case 'b':
-                novaPeca = (tipoPeca == peaoBranco) ? bispoBranco : bispoPreto;
-                pecaValida = 1;
-                break;
-            case 'C':
-            case 'c':
-                novaPeca = (tipoPeca == peaoBranco) ? cavaloBranco : cavaloPreto;
-                pecaValida = 1;
-                break;
-            default:
-                printf(VERMELHO "Entrada invalida! Tente novamente.\n" RESET);
-                break;
+        case 'D':
+        case 'd':
+            novaPeca = (tipoPeca == peaoBranco) ? damaBranca : damaPreta;
+            pecaValida = 1;
+            break;
+        case 'T':
+        case 't':
+            novaPeca = (tipoPeca == peaoBranco) ? torreBranca : torrePreta;
+            pecaValida = 1;
+            break;
+        case 'B':
+        case 'b':
+            novaPeca = (tipoPeca == peaoBranco) ? bispoBranco : bispoPreto;
+            pecaValida = 1;
+            break;
+        case 'C':
+        case 'c':
+            novaPeca = (tipoPeca == peaoBranco) ? cavaloBranco : cavaloPreto;
+            pecaValida = 1;
+            break;
+        default:
+            printf(VERMELHO "Entrada invalida! Tente novamente.\n" RESET);
+            break;
         }
     }
     // Peça atual vira peça escolhida
@@ -656,7 +659,6 @@ void moverPeca(int inicioX, int inicioY, int fimX, int fimY)
     }
 }
 
-
 void obterMovimentoUsuario()
 {
     // 3 para caractere nulo de terminação
@@ -712,12 +714,11 @@ void obterMovimentoUsuario()
     }
 }
 
-int main()
+void iniciarJogo()
 {
     iniciarTabuleiro();
     exibirTabuleiro();
     printf("\n");
-
     while (1)
     {
         obterMovimentoUsuario();
@@ -725,4 +726,64 @@ int main()
         exibirTabuleiro();
         printf("\n");
     }
+}
+
+void exibirPontuacao()
+{
+    limparTela();
+    printf(" Pontuacao:\n");
+    printf(" -----------------------------\n");
+    printf(" Brancas: %d\n", pontosBrancas);
+    printf(" -----------------------------\n");
+    printf(MAGENTA " Pretas" RESET ":%d\n", pontosPretas);
+    printf(" -----------------------------\n\n");
+
+    printf(" Digite qualquer tecla para retornar ao menu\n");
+    getchar();
+    getchar();
+}
+void menu()
+{
+    limparTela();
+    while (1)
+    {
+        limparTela();
+        printf(" _______________________________\n");
+        printf(" __  __         _              \n");
+        printf(" \\ \\/ /__ _  __| |_ __ ___ ____\n");
+        printf("  \\  // _` |/ _` | '__/ _ \\_  /\n");
+        printf("  /  \\ (_| | (_| | | |  __// / \n");
+        printf(" /_/\\_\\__,_|\\__,_|_|  \\___/___|\n");
+        printf(" _______________________________\n");
+
+        int opcao;
+        printf(" \n Escolha uma opcao:\n");
+        printf(" \n -----------------------------");
+        printf(" \n 1 - Iniciar um novo jogo\n");
+        printf(" -----------------------------\n");
+        printf(" 2 - Ver placar atual\n");
+        printf(" -----------------------------\n");
+        printf(" 3 - Regras \n");
+        printf(" -----------------------------\n");
+        printf(" 4 - Sair\n");
+
+        printf("\n Opcao: ");
+        scanf("%d", &opcao);
+
+        switch (opcao)
+        {
+        case 1:
+            iniciarJogo();
+        case 2:
+            exibirPontuacao();
+        case 4:
+            printf(VERDE "\nObrigado por jogar, ate mais!\n" RESET);
+            exit(0);
+        }
+    }
+}
+
+int main()
+{
+    menu();
 }
