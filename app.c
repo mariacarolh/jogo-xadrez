@@ -711,7 +711,7 @@ void verificarCheques()
         if (verificarChequeMate(reiBranco, peaoPreto, torrePreta, cavaloPreto, bispoPreto, damaPreta))
         {
             exibirTabuleiro();
-            printf(VERDE "Rei Branco esta em cheque-mate! Pretas ganham!" RESET);
+            printf(VERDE "Rei Preto esta em cheque-mate! Brancas ganham!" RESET);
             printf("\n Pressione qualquer tecla para voltar ao menu...\n");
             getchar();
             getchar();
@@ -728,7 +728,7 @@ void verificarCheques()
         if (verificarChequeMate(reiPreto, peaoBranco, torreBranca, cavaloBranco, bispoBranco, damaBranca))
         {
             exibirTabuleiro();
-            printf(VERDE "\nRei Branco esta em cheque-mate! Pretas ganham!\n" RESET);
+            printf(VERDE "\nRei Preto esta em cheque-mate! Brancas ganham!\n" RESET);
             printf("\n Pressione qualquer tecla para voltar ao menu...\n");
             getchar();
             getchar();
@@ -838,6 +838,7 @@ void menu()
         case 1:
             jogoContinua = 1;
             turno = 0;
+            mensagemErro[0] = '\0';
             iniciarJogo();
             break;
         case 2:
