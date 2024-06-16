@@ -706,12 +706,14 @@ void obterMovimentoUsuario()
 
 void verificarCheques()
 {
+    // Verifica se o rei branco está em cheque
     if (verificarCheque(reiBranco, peaoPreto, torrePreta, cavaloPreto, bispoPreto, damaPreta))
     {
+        // Verifica se o rei branco está em cheque-mate
         if (verificarChequeMate(reiBranco, peaoPreto, torrePreta, cavaloPreto, bispoPreto, damaPreta))
         {
             exibirTabuleiro();
-            printf(VERDE "Rei Preto esta em cheque-mate! Brancas ganham!" RESET);
+            printf(VERDE "Rei Branco esta em cheque-mate! Pretas ganham!" RESET);
             printf("\n Pressione qualquer tecla para voltar ao menu...\n");
             getchar();
             getchar();
@@ -723,8 +725,11 @@ void verificarCheques()
             snprintf(mensagemErro, sizeof(mensagemErro), RESET VERMELHO_ESCURO "Rei Branco esta em cheque!" RESET);
         }
     }
+    
+    // Verifica se o rei preto está em cheque
     else if (verificarCheque(reiPreto, peaoBranco, torreBranca, cavaloBranco, bispoBranco, damaBranca))
     {
+        // Verifica se o rei preto está em cheque-mate
         if (verificarChequeMate(reiPreto, peaoBranco, torreBranca, cavaloBranco, bispoBranco, damaBranca))
         {
             exibirTabuleiro();
@@ -780,18 +785,17 @@ void exibirRegras()
     limparTela();
     printf(" Regras basicas de como jogar:\n");
     printf(" -----------------------------\n\n");
-
-    printf(" Primeiramente para conseguir jogar, sera necessario que ja tenha um conhecimento previo em xadrez.\n\n");
+    printf(" Primeiramente, para conseguir jogar, sera necessario que ja possua um conhecimento previo em xadrez.\n\n");
     printf(" -----------------------------\n");
     printf(" Os movimentos do jogo funcionam da seguinte maneira:\n");
-    printf(" Ha dois comandos para movimentar uma peca\n");
+    printf(" Ha dois comandos para movimentar uma peca\n\n");
     printf(" O primeiro para dizer qual peca sera movida e o segundo para onde ela ira\n\n");
-    printf(" Primeiro sempre digite a letra que equivale a coluna, ou seja o " AMARELO "Y\n" RESET);
-    printf(" Em seguida digite a letra que equivale a linha, ou seja o " AMARELO "X\n" RESET);
+    printf(" Primeiro, sempre digite a letra que equivale a coluna, ou seja, o " AMARELO "Y\n" RESET);
+    printf(" Em seguida, digite a letra que equivale a linha, ou seja, o " AMARELO "X\n\n" RESET);
     printf(" Exemplo: " AMARELO "a2" RESET ", " AMARELO "h5" RESET ", " AMARELO "f8" RESET "\n");
     printf(" -----------------------------\n\n");
-    printf(" Caso queira sair do jogo, digite" VERMELHO " 'sa' " RESET "a qualquer momento\n");
-    printf(" A partida sera cancelada, nenhum dos jogadores ira ganhar" VERDE " pontos de vitoria\n\n" RESET);
+    printf(" Caso queira sair do jogo, digite: '" VERMELHO "sa" RESET "'\n");
+    printf(" A partida sera cancelada e nenhum dos jogadores ira ganhar" VERDE " pontos de vitoria\n\n" RESET);
     printf(" Digite qualquer tecla para retornar ao menu\n");
     getchar();
     getchar();
