@@ -341,6 +341,41 @@ int verificarChequeMate(char rei, char adversarioPeao, char adversarioTorre, cha
         }
     }
 
+    // Verifica se alguma peça pode capturar a peça que está dando cheque
+    for (int x = 0; x < TAM_TABULEIRO; x++)
+    {
+        for (int y = 0; y < TAM_TABULEIRO; y++)
+        {
+            char peca = tabuleiro[x][y];
+            if ((rei == reiBranco && peca >= 'A' && peca <= 'Z') || (rei == reiPreto && peca >= 'a' && peca <= 'z'))
+            {
+                // Simula a captura da peça que está dando cheque
+                char pecaOrigem = tabuleiro[x][y];
+                for (int dx = -1; dx <= 1; dx++)
+                {
+                    for (int dy = -1; dy <= 1; dy++)
+                    {
+                        int novoX = x + dx;
+                        int novoY = y + dy;
+                        if (posicaoValida(novoX, novoY) && !pecaAliada(peca, tabuleiro[novoX][novoY]))
+                        {
+                            char pecaDestino = tabuleiro[novoX][novoY];
+                            tabuleiro[novoX][novoY] = pecaOrigem;
+                            tabuleiro[x][y] = espacoVazio;
+                            int cheque = verificarCheque(rei, adversarioPeao, adversarioTorre, adversarioCavalo, adversarioBispo, adversarioDama);
+                            tabuleiro[x][y] = pecaOrigem;
+                            tabuleiro[novoX][novoY] = pecaDestino;
+                            if (!cheque)
+                            {
+                                return 0; // Uma peça pode capturar a peça que está dando cheque
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     // Se nenhum movimento é possível para sair do cheque, é cheque-mate
     return 1;
 }
