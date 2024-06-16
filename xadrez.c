@@ -48,6 +48,7 @@ void limparTela()
 void exibirTabuleiro()
 {
     limparTela();
+    char (*ptrTabuleiro)[TAM_TABULEIRO] = tabuleiro;
 
     for (int x = 0; x < TAM_TABULEIRO; x++) // x
     {
@@ -56,11 +57,13 @@ void exibirTabuleiro()
 
         for (int y = 0; y < TAM_TABULEIRO; y++) // y
         {
-            char peca = tabuleiro[x][y];
+            char peca = ptrTabuleiro[x][y];
 
-            if (peca == peaoPreto || peca == torrePreta || peca == cavaloPreto || peca == bispoPreto || peca == reiPreto || peca == damaPreta)
+            // Se for peça preta
+            if (peca >= 'a' && peca <= 'z')
             {
-                printf("| " MAGENTA "%c" RESET " ", tabuleiro[x][y]);
+                // Colorir peças pretas com Magenta
+                printf("| " MAGENTA "%c" RESET " ", peca);
             }
             else
             {
@@ -93,12 +96,14 @@ void iniciarTabuleiro()
             {peaoBranco, peaoBranco, peaoBranco, peaoBranco, peaoBranco, peaoBranco, peaoBranco, peaoBranco},
             {torreBranca, cavaloBranco, bispoBranco, damaBranca, reiBranco, bispoBranco, cavaloBranco, torreBranca}};
 
+    char (*ptrTabuleiro)[TAM_TABULEIRO] = tabuleiro;
+
     for (int x = 0; x < TAM_TABULEIRO; x++)
     {
         for (int y = 0; y < TAM_TABULEIRO; y++)
         {
             // posicoesIniciais foi inserido ao exibirTabuleiro já com as peças em suas posições corretas
-            tabuleiro[x][y] = posicoesIniciais[x][y];
+            ptrTabuleiro[x][y] = posicoesIniciais[x][y];
         }
     }
 }
@@ -191,6 +196,8 @@ int caminhoDiagonalLivre(char inicioX, char inicioY, char fimX, char fimY)
 
 int verificarCheque(char rei, char adversarioPeao, char adversarioTorre, char adversarioCavalo, char adversarioBispo, char adversarioDama)
 {
+
+    // Localiza a posição atual do rei no tabuleiro
     int reiX, reiY;
     for (int x = 0; x < TAM_TABULEIRO; x++)
     {
@@ -204,14 +211,14 @@ int verificarCheque(char rei, char adversarioPeao, char adversarioTorre, char ad
         }
     }
 
-    // Verificar peões adversários
+    // Verifica se algum peão adversário está atacando o rei
     int direcaoPeao = (adversarioPeao == 'p') ? 1 : -1;
     if (posicaoValida(reiX + direcaoPeao, reiY - 1) && tabuleiro[reiX + direcaoPeao][reiY - 1] == adversarioPeao)
         return 1;
     if (posicaoValida(reiX + direcaoPeao, reiY + 1) && tabuleiro[reiX + direcaoPeao][reiY + 1] == adversarioPeao)
         return 1;
 
-    // Verificar cavalo adversário
+    // Verifica se algum cavalo adversário está atacando o rei
     int movimentosCavalo[8][2] = {{2, 1}, {2, -1}, {-2, 1}, {-2, -1}, {1, 2}, {1, -2}, {-1, 2}, {-1, -2}};
     for (int i = 0; i < 8; i++)
     {
@@ -221,7 +228,7 @@ int verificarCheque(char rei, char adversarioPeao, char adversarioTorre, char ad
             return 1;
     }
 
-    // Verificar linha/coluna (torre e dama)
+    // Verifica se alguma torre ou dama adversária está atacando o rei na horizontal ou vertical
     for (int x = reiX + 1; x < TAM_TABULEIRO; x++)
     {
         if (tabuleiro[x][reiY] == adversarioTorre || tabuleiro[x][reiY] == adversarioDama)
@@ -251,7 +258,7 @@ int verificarCheque(char rei, char adversarioPeao, char adversarioTorre, char ad
             break;
     }
 
-    // Verificar diagonais (bispo e dama)
+    // Verifica se algum bispo ou dama adversária está atacando o rei nas diagonais
     for (int i = 1; posicaoValida(reiX + i, reiY + i); i++)
     {
         if (tabuleiro[reiX + i][reiY + i] == adversarioBispo || tabuleiro[reiX + i][reiY + i] == adversarioDama)
@@ -286,6 +293,7 @@ int verificarCheque(char rei, char adversarioPeao, char adversarioTorre, char ad
 
 int verificarChequeMate(char rei, char adversarioPeao, char adversarioTorre, char adversarioCavalo, char adversarioBispo, char adversarioDama)
 {
+    // Localiza a posição do rei no tabuleiro
     int reiX, reiY;
     for (int x = 0; x < TAM_TABULEIRO; x++)
     {
@@ -300,25 +308,25 @@ int verificarChequeMate(char rei, char adversarioPeao, char adversarioTorre, cha
         }
     }
 
-    // Verificar todos os movimentos possíveis do rei
-    for (int i = -1; i <= 1; i++)
+    // Verifica todos os movimentos possíveis do rei
+    for (int x = -1; x <= 1; x++)
     {
-        for (int j = -1; j <= 1; j++)
+        for (int y = -1; y <= 1; y++)
         {
-            if (i == 0 && j == 0)
+            if (x == 0 && y == 0)
                 continue;
 
-            int novoX = reiX + i;
-            int novoY = reiY + j;
+            int novoX = reiX + x;
+            int novoY = reiY + y;
 
             if (posicaoValida(novoX, novoY) && !pecaAliada(rei, tabuleiro[novoX][novoY]))
             {
-                // Simula o movimento
+                // Simula o movimento do rei para a nova posição
                 char pecaOrigem = tabuleiro[novoX][novoY];
                 tabuleiro[novoX][novoY] = rei;
                 tabuleiro[reiX][reiY] = espacoVazio;
 
-                // Verifica se o rei ainda está em cheque
+                // Verifica se o rei ainda está em cheque após o movimento
                 int cheque = verificarCheque(rei, adversarioPeao, adversarioTorre, adversarioCavalo, adversarioBispo, adversarioDama);
 
                 // Reverte o movimento
@@ -333,7 +341,7 @@ int verificarChequeMate(char rei, char adversarioPeao, char adversarioTorre, cha
         }
     }
 
-    // Se nenhum movimento é possível para sair do cheque
+    // Se nenhum movimento é possível para sair do cheque, é cheque-mate
     return 1;
 }
 
@@ -536,9 +544,13 @@ int moverDama(int inicioX, int inicioY, int fimX, int fimY)
     int casasAndadasY = fimY - inicioY;
 
     // Segue a combinação das regras do bispo e da torre
-    if ((inicioX == fimX || inicioY == fimY) || (casasAndadasX == casasAndadasY || casasAndadasX == -casasAndadasY))
+    if ((inicioX == fimX || inicioY == fimY))
     {
-        return (caminhoDiagonalLivre(inicioX, inicioY, fimX, fimY) && caminhoLinhaColunaLivre(inicioX, inicioY, fimX, fimY));
+        return caminhoLinhaColunaLivre(inicioX, inicioY, fimX, fimY);
+    }
+    else if (casasAndadasX == casasAndadasY || casasAndadasX == -casasAndadasY)
+    {
+        return caminhoDiagonalLivre(inicioX, inicioY, fimX, fimY);
     }
     else
     {
@@ -546,6 +558,7 @@ int moverDama(int inicioX, int inicioY, int fimX, int fimY)
         return 0;
     }
 }
+
 
 int moverRei(int inicioX, int inicioY, int fimX, int fimY)
 {
@@ -638,8 +651,11 @@ void obterMovimentoUsuario()
     // 3 para caractere nulo de terminação
     char inicio[3];
     char fim[3];
+    
+    int par = turno % 2 == 0;
+    int impar = turno % 2 == 1;
 
-    if (turno % 2 == 0)
+    if (par)
     {
         printf("Turno das pecas brancas");
     }
@@ -688,7 +704,7 @@ void obterMovimentoUsuario()
 
     char peca = tabuleiro[inicioX][inicioY];
 
-    if (turno % 2 == 0 && (peca == peaoPreto || peca == torrePreta || peca == cavaloPreto || peca == bispoPreto || peca == reiPreto || peca == damaPreta) || turno % 2 == 1 && (peca == peaoBranco || peca == torreBranca || peca == cavaloBranco || peca == bispoBranco || peca == reiBranco || peca == damaBranca))
+    if (par && (peca >= 'a' && peca <= 'z') || impar && (peca >= 'A' && peca <= 'Z'))
     {
         snprintf(mensagemErro, sizeof(mensagemErro), "Nao e o turno desta peca, tente novamente!");
         return;
