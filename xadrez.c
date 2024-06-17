@@ -293,8 +293,8 @@ int verificarCheque(char rei, char adversarioPeao, char adversarioTorre, char ad
 
 int verificarChequeMate(char rei, char adversarioPeao, char adversarioTorre, char adversarioCavalo, char adversarioBispo, char adversarioDama)
 {
-    // Localiza a posição do rei no tabuleiro
-    int reiX, reiY;
+    // Encontrar a posição do rei
+    int reiX = -1, reiY = -1;
     for (int x = 0; x < TAM_TABULEIRO; x++)
     {
         for (int y = 0; y < TAM_TABULEIRO; y++)
@@ -306,77 +306,121 @@ int verificarChequeMate(char rei, char adversarioPeao, char adversarioTorre, cha
                 break;
             }
         }
+        if (reiX != -1)  // Sai do loop externo se encontrar o rei
+            break;
     }
 
-    // Verifica todos os movimentos possíveis do rei
-    for (int x = -1; x <= 1; x++)
+    // Verificar todos os movimentos possíveis do rei
+    for (int dx = -1; dx <= 1; dx++)
     {
-        for (int y = -1; y <= 1; y++)
+        for (int dy = -1; dy <= 1; dy++)
         {
-            if (x == 0 && y == 0)
+            if (dx == 0 && dy == 0)
                 continue;
 
-            int novoX = reiX + x;
-            int novoY = reiY + y;
+            int novoX = reiX + dx;
+            int novoY = reiY + dy;
 
+            // Verificar se a nova posição é válida e não é uma peça aliada
             if (posicaoValida(novoX, novoY) && !pecaAliada(rei, tabuleiro[novoX][novoY]))
             {
-                // Simula o movimento do rei para a nova posição
+                // Simular o movimento do rei para a nova posição
                 char pecaOrigem = tabuleiro[novoX][novoY];
                 tabuleiro[novoX][novoY] = rei;
                 tabuleiro[reiX][reiY] = espacoVazio;
 
-                // Verifica se o rei ainda está em cheque após o movimento
-                int cheque = verificarCheque(rei, adversarioPeao, adversarioTorre, adversarioCavalo, adversarioBispo, adversarioDama);
+                // Verificar se o rei ainda está em cheque após o movimento
+                int emCheque = verificarCheque(rei, adversarioPeao, adversarioTorre, adversarioCavalo, adversarioBispo, adversarioDama);
 
-                // Reverte o movimento
+                // Reverter o movimento simulado
                 tabuleiro[reiX][reiY] = rei;
                 tabuleiro[novoX][novoY] = pecaOrigem;
 
-                if (!cheque)
-                {
-                    return 0; // O rei pode escapar do cheque
-                }
+                // Se o rei não está mais em cheque, não é cheque-mate
+                if (!emCheque)
+                    return 0;
             }
         }
     }
 
-    // Verifica se alguma peça pode capturar a peça que está dando cheque
-    for (int x = 0; x < TAM_TABULEIRO; x++)
+    // Verificar se o rei pode bloquear a linha de ataque horizontal ou verticalmente
+    // Verificar horizontalmente
+    for (int x = reiX + 1; x < TAM_TABULEIRO; x++)
     {
-        for (int y = 0; y < TAM_TABULEIRO; y++)
+        char pecaAtual = tabuleiro[x][reiY];
+        if (pecaAtual != espacoVazio)
         {
-            char peca = tabuleiro[x][y];
-            if ((rei == reiBranco && peca >= 'A' && peca <= 'Z') || (rei == reiPreto && peca >= 'a' && peca <= 'z'))
+            if (pecaAtual == adversarioTorre || pecaAtual == adversarioDama)
             {
-                // Simula a captura da peça que está dando cheque
-                char pecaOrigem = tabuleiro[x][y];
-                for (int dx = -1; dx <= 1; dx++)
+                // Verificar se alguma peça aliada pode bloquear a linha de ataque
+                for (int i = reiX + 1; i < x; i++)
                 {
-                    for (int dy = -1; dy <= 1; dy++)
-                    {
-                        int novoX = x + dx;
-                        int novoY = y + dy;
-                        if (posicaoValida(novoX, novoY) && !pecaAliada(peca, tabuleiro[novoX][novoY]))
-                        {
-                            char pecaDestino = tabuleiro[novoX][novoY];
-                            tabuleiro[novoX][novoY] = pecaOrigem;
-                            tabuleiro[x][y] = espacoVazio;
-                            int cheque = verificarCheque(rei, adversarioPeao, adversarioTorre, adversarioCavalo, adversarioBispo, adversarioDama);
-                            tabuleiro[x][y] = pecaOrigem;
-                            tabuleiro[novoX][novoY] = pecaDestino;
-                            if (!cheque)
-                            {
-                                return 0; // Uma peça pode capturar a peça que está dando cheque
-                            }
-                        }
-                    }
+                    if (!pecaAliada(rei, tabuleiro[i][reiY]))
+                        return 0; // Não é cheque-mate
                 }
+                return 1; // É cheque-mate
             }
+            break;
+        }
+    }
+    for (int x = reiX - 1; x >= 0; x--)
+    {
+        char pecaAtual = tabuleiro[x][reiY];
+        if (pecaAtual != espacoVazio)
+        {
+            if (pecaAtual == adversarioTorre || pecaAtual == adversarioDama)
+            {
+                // Verificar se alguma peça aliada pode bloquear a linha de ataque
+                for (int i = reiX - 1; i > x; i--)
+                {
+                    if (!pecaAliada(rei, tabuleiro[i][reiY]))
+                        return 0; // Não é cheque-mate
+                }
+                return 1; // É cheque-mate
+            }
+            break;
         }
     }
 
-    // Se nenhum movimento é possível para sair do cheque, é cheque-mate
+    // Verificar verticalmente
+    for (int y = reiY + 1; y < TAM_TABULEIRO; y++)
+    {
+        char pecaAtual = tabuleiro[reiX][y];
+        if (pecaAtual != espacoVazio)
+        {
+            if (pecaAtual == adversarioTorre || pecaAtual == adversarioDama)
+            {
+                // Verificar se alguma peça aliada pode bloquear a linha de ataque
+                for (int i = reiY + 1; i < y; i++)
+                {
+                    if (!pecaAliada(rei, tabuleiro[reiX][i]))
+                        return 0; // Não é cheque-mate
+                }
+                return 1; // É cheque-mate
+            }
+            break;
+        }
+    }
+    for (int y = reiY - 1; y >= 0; y--)
+    {
+        char pecaAtual = tabuleiro[reiX][y];
+        if (pecaAtual != espacoVazio)
+        {
+            if (pecaAtual == adversarioTorre || pecaAtual == adversarioDama)
+            {
+                // Verificar se alguma peça aliada pode bloquear a linha de ataque
+                for (int i = reiY - 1; i > y; i--)
+                {
+                    if (!pecaAliada(rei, tabuleiro[reiX][i]))
+                        return 0; // Não é cheque-mate
+                }
+                return 1; // É cheque-mate
+            }
+            break;
+        }
+    }
+
+    // Se nenhum movimento ou bloqueio é possível, é cheque-mate
     return 1;
 }
 
@@ -578,14 +622,10 @@ int moverDama(int inicioX, int inicioY, int fimX, int fimY)
     int casasAndadasX = fimX - inicioX;
     int casasAndadasY = fimY - inicioY;
 
-    // Segue a combinação das regras do bispo e da torre
-    if ((inicioX == fimX || inicioY == fimY))
+    // combinação entre os movimentos do bispo e torre
+    if ((inicioX == fimX || inicioY == fimY) || (casasAndadasX == casasAndadasY || casasAndadasX == -casasAndadasY))
     {
-        return caminhoLinhaColunaLivre(inicioX, inicioY, fimX, fimY);
-    }
-    else if (casasAndadasX == casasAndadasY || casasAndadasX == -casasAndadasY)
-    {
-        return caminhoDiagonalLivre(inicioX, inicioY, fimX, fimY);
+        return (caminhoLinhaColunaLivre(inicioX, inicioY, fimX, fimY) || caminhoDiagonalLivre(inicioX, inicioY, fimX, fimY));
     }
     else
     {
@@ -594,12 +634,12 @@ int moverDama(int inicioX, int inicioY, int fimX, int fimY)
     }
 }
 
-
 int moverRei(int inicioX, int inicioY, int fimX, int fimY)
 {
     int casasAndadasX = fimX - inicioX;
     int casasAndadasY = fimY - inicioY;
 
+    //verifica se o rei andou apenas uma casa só
     if ((casasAndadasX >= -1 && casasAndadasX <= 1) && (casasAndadasY >= -1 && casasAndadasY <= 1))
     {
         return 1;
